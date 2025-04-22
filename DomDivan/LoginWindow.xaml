@@ -1,0 +1,80 @@
+﻿<Window x:Class="DomDivan.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DomDivan"
+        mc:Ignorable="d"
+        Title="Авторизация" 
+        Height="420" 
+        Width="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Логотип -->
+        <Image Grid.Row="0"
+               Source="/Image/logo.png" 
+               Width="100"
+               Height="100"
+               HorizontalAlignment="Center"
+               Margin="0,20,0,20"/>
+
+        <!-- Поле для логина -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="0,10,0,10">
+            <TextBlock Text="Логин:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"
+                       FontSize="14"/>
+            <TextBox x:Name="UsernameTextBox"
+                     Width="200"
+                     Height="30"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Поле для пароля -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="0,10,0,10">
+            <TextBlock Text="Пароль:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"
+                       FontSize="14"/>
+            <TextBox x:Name="PasswordBox"
+                     Width="200"
+                     Height="30"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Кнопка "Войти" -->
+        <Button Grid.Row="3"
+                Content="Войти"
+                Width="100"
+                Height="30"
+                HorizontalAlignment="Center"
+                Margin="0,20,0,20"
+                Click="LoginButton_Click"/>
+
+        <!-- Кнопка "Гость" -->
+        <Button Grid.Row="4"
+        Content="Гость"
+        Width="100"
+        Height="30"
+        HorizontalAlignment="Center"
+        Margin="0,20,0,20"
+        Click="GuestButton_Click"/>
+    </Grid>
+</Window>
