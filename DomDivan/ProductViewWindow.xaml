@@ -8,7 +8,43 @@
         Title="Просмотр товара" Height="800" Width="1200">
     <Window.Resources>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:BoolToYesNoConverter x:Key="BoolToYesNoConverter" />
+        <local:HexToBrushConverter x:Key="HexToBrushConverter" />
+        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+
+        <!-- Стиль для RadioButton вариаций -->
+        <Style x:Key="VariationRadioButtonStyle" TargetType="RadioButton">
+            <Setter Property="Margin" Value="0,0,10,5"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF4081"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,10 +53,19 @@
         </Grid.RowDefinitions>
 
         <!-- Шапка с названием и кнопкой назад -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FFEEE8E8">
-            <Button x:Name="BackButton" Content="Назад" Width="80" Height="30" Margin="0,0,20,0" Click="BackButton_Click"/>
-            <TextBlock x:Name="ProductTitle" Text="{Binding Product.Name}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
-        </StackPanel>
+        <Border Padding="10">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FFEEE8E8">
+                <Button x:Name="BackButton" Content="Назад" Width="80" Height="30" Margin="0,0,20,0" Click="BackButton_Click"/>
+                <TextBlock x:Name="ProductTitle" FontSize="20" FontWeight="Bold" VerticalAlignment="Center">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{} {0} &quot;{1}&quot;">
+                            <Binding Path="Product.Category.Name"/>
+                            <Binding Path="Product.Name"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </Border>
 
         <!-- Основное содержимое -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -30,10 +75,35 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Блок для сообщения о не найденной вариации -->
+                <Grid Grid.ColumnSpan="2" Visibility="{Binding IsVariantNotFound, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Вариация не найдена" 
+                       FontSize="32" 
+                       FontWeight="Bold" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Foreground="Red"/>
+                </Grid>
+
                 <!-- Левая часть - изображения -->
-                <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                    <!-- Главное изображение -->
-                    <Image x:Name="MainImage" Stretch="Uniform" Height="400" Margin="0,0,0,20"/>
+                <StackPanel Grid.Column="0" Margin="0,0,20,0" Visibility="{Binding IsVariantNotFound, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <!-- Главное изображение с кнопками перелистывания -->
+                    <Grid Height="400" Margin="0,0,0,20">
+                        <Image x:Name="MainImage" Stretch="Uniform"/>
+
+                        <!-- Кнопки перелистывания -->
+                        <Button x:Name="PrevPhotoButton" Content="&lt;" Width="40" Height="40" 
+                                HorizontalAlignment="Left" VerticalAlignment="Center" 
+                                Click="PrevPhotoButton_Click" 
+                                Visibility="{Binding CurrentVariant.Photos.Count, Converter={StaticResource CountToVisibilityConverter}}"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+
+                        <Button x:Name="NextPhotoButton" Content="&gt;" Width="40" Height="40" 
+                                HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                Click="NextPhotoButton_Click" 
+                                Visibility="{Binding CurrentVariant.Photos.Count, Converter={StaticResource CountToVisibilityConverter}}"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                    </Grid>
 
                     <!-- Галерея миниатюр -->
                     <ItemsControl x:Name="ThumbnailsGallery" ItemsSource="{Binding CurrentVariant.Photos}">
@@ -56,15 +126,22 @@
                 <!-- Правая часть - информация о товаре -->
                 <StackPanel Grid.Column="1">
                     <!-- Цена -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20" VerticalAlignment="Center">
                         <TextBlock Text="{Binding CurrentVariant.Product.DiscountPrice, StringFormat='{}{0:C}'}" 
-                                   FontSize="24" FontWeight="Bold" Foreground="Red"/>
-                        <TextBlock Text="{Binding CurrentVariant.Product.Price, StringFormat='{}{0:C}'}" 
-                                   FontSize="18" TextDecorations="Strikethrough" Margin="10,0,0,0" 
-                                   Foreground="Gray" Visibility="{Binding CurrentVariant.Product.Discount, Converter={StaticResource NullToVisibilityConverter}}"/>
-                        <TextBlock Text="{Binding CurrentVariant.Product.Discount, StringFormat='-{0}%'}" 
-                                   FontSize="18" Margin="10,0,0,0" Foreground="Red"
-                                   Visibility="{Binding CurrentVariant.Product.Discount, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                   FontSize="24" FontWeight="Bold" Foreground="Red"
+                                   VerticalAlignment="Center"/>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                            <TextBlock Text="{Binding CurrentVariant.Product.Price, StringFormat='{}{0:C}'}" 
+                                       FontSize="18" TextDecorations="Strikethrough" 
+                                       Foreground="Gray" VerticalAlignment="Center"
+                                       Visibility="{Binding CurrentVariant.Product.Discount, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                            <TextBlock Text="{Binding CurrentVariant.Product.Discount, StringFormat='-{0}%'}" 
+                                       FontSize="18" Margin="5,0,0,0" Foreground="Red"
+                                       VerticalAlignment="Center"
+                                       Visibility="{Binding CurrentVariant.Product.Discount, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Вариации товара -->
@@ -73,7 +150,14 @@
 
                         <!-- Цвета -->
                         <StackPanel Margin="20,0,0,10" Visibility="{Binding HasColors, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <TextBlock Text="Цвет:" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Цвет:" Margin="0,0,5,10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedColor.Name}" FontWeight="Bold" Margin="0,0,0,10"/>
+                            </Grid>
                             <ItemsControl ItemsSource="{Binding ColorOptions}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -82,15 +166,15 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <RadioButton GroupName="Colors" Margin="0,0,10,5" 
+                                        <RadioButton GroupName="Colors" 
                                                      IsChecked="{Binding IsSelected}" 
-                                                     Checked="ColorVariation_Checked">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Border Width="20" Height="20" Margin="0,0,5,0" 
-                                                        BorderBrush="Black" BorderThickness="1"
-                                                        Background="{Binding Color.HexID, Converter={StaticResource HexToBrushConverter}}"/>
-                                                <TextBlock Text="{Binding Color.Name}" VerticalAlignment="Center"/>
-                                            </StackPanel>
+                                                     Checked="ColorVariation_Checked"
+                                                     Style="{StaticResource VariationRadioButtonStyle}"
+                                                     ToolTip="{Binding Color.Name}">
+                                            <Border Width="30" Height="30" 
+                                                    BorderBrush="Black" BorderThickness="1"
+                                                    CornerRadius="15"
+                                                    Background="{Binding Color.HexID, Converter={StaticResource HexToBrushConverter}}"/>
                                         </RadioButton>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -99,7 +183,14 @@
 
                         <!-- Ткани -->
                         <StackPanel Margin="20,0,0,10" Visibility="{Binding HasCloths, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <TextBlock Text="Ткань:" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Ткань:" Margin="0,0,5,10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedCloth.Name}" FontWeight="Bold" Margin="0,0,0,10"/>
+                            </Grid>
                             <ItemsControl ItemsSource="{Binding ClothOptions}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -108,11 +199,11 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <RadioButton GroupName="Cloths" Margin="0,0,10,5" 
+                                        <RadioButton GroupName="Cloths" 
                                                      IsChecked="{Binding IsSelected}"
-                                                     Checked="ClothVariation_Checked">
-                                            <TextBlock Text="{Binding Cloth.Name}"/>
-                                        </RadioButton>
+                                                     Checked="ClothVariation_Checked"
+                                                     Content="{Binding Cloth.Name}"
+                                                     Style="{StaticResource VariationRadioButtonStyle}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -120,7 +211,14 @@
 
                         <!-- Типы диванов -->
                         <StackPanel Margin="20,0,0,10" Visibility="{Binding HasSofaTypes, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <TextBlock Text="Тип:" Margin="0,0,0,5"/>
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Форма:" Margin="0,0,5,10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedSofaType.Name}" FontWeight="Bold" Margin="0,0,0,10"/>
+                            </Grid>
                             <ItemsControl ItemsSource="{Binding SofaTypeOptions}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -129,11 +227,11 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <RadioButton GroupName="SofaTypes" Margin="0,0,10,5" 
+                                        <RadioButton GroupName="SofaTypes" 
                                                      IsChecked="{Binding IsSelected}"
-                                                     Checked="SofaTypeVariation_Checked">
-                                            <TextBlock Text="{Binding SofaType.Name}"/>
-                                        </RadioButton>
+                                                     Checked="SofaTypeVariation_Checked"
+                                                     Content="{Binding SofaType.Name}"
+                                                     Style="{StaticResource VariationRadioButtonStyle}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -141,9 +239,11 @@
                     </StackPanel>
 
                     <!-- Характеристики -->
-                    <StackPanel Margin="0,0,0,20">
+                    <StackPanel Margin="0,0,0,20" Visibility="{Binding IsVariantNotFound, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                         <TextBlock Text="Характеристики:" FontWeight="Bold" Margin="0,0,0,10"/>
-                        <Grid>
+
+                        <!-- Основные характеристики -->
+                        <Grid Margin="20,0,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -156,64 +256,82 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
+                            <!-- Информация о вариации -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Цвет:" Margin="0,0,10,5"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentVariant.Color.Name}" Margin="0,0,0,5"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Ткань:" Margin="0,0,10,5"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentVariant.Cloth.Name}" Margin="0,0,0,5"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Форма:" Margin="0,0,10,5"
+                                       Visibility="{Binding HasSofaTypes, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentVariant.SofaType.Name}" Margin="0,0,0,5"
+                                       Visibility="{Binding HasSofaTypes, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
                             <!-- Общие характеристики -->
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Габариты:" Margin="0,0,10,5"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentVariant.Product.Dimensions}" Margin="0,0,0,5"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Габариты:" Margin="0,0,10,5"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentVariant.Product.Dimensions}" Margin="0,0,0,5"/>
 
                             <!-- Диван -->
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Спальное место:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Спальное место:" Margin="0,0,10,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SofaInfo.SleepingDimensions}" Margin="0,0,0,5"
-                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Наполнитель:" Margin="0,0,10,5"
-                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SofaInfo.Filler.Name}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SofaInfo.SleepingDimensions}" Margin="0,0,0,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Механизм:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Наполнитель:" Margin="0,0,10,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SofaInfo.FoldingMechanism.Name}" Margin="0,0,0,5"
-                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Ящик для белья:" Margin="0,0,10,5"
-                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SofaInfo.HasLinenDrawer, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SofaInfo.Filler.Name}" Margin="0,0,0,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Подлокотники:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Механизм:" Margin="0,0,10,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SofaInfo.HasArmrests, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SofaInfo.FoldingMechanism.Name}" Margin="0,0,0,5"
+                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Ящик для белья:" Margin="0,0,10,5"
+                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding SofaInfo.HasLinenDrawer, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Подлокотники:" Margin="0,0,10,5"
+                                       Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding SofaInfo.HasArmrests, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
                                        Visibility="{Binding IsSofa, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                             <!-- Кровать -->
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Спальное место:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="9" Grid.Column="0" Text="Спальное место:" Margin="0,0,10,5"
                                        Visibility="{Binding IsBed, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding BedInfo.SleepingDimensions}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding BedInfo.SleepingDimensions}" Margin="0,0,0,5"
                                        Visibility="{Binding IsBed, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                             <!-- Кресло -->
-                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Наполнитель:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="10" Grid.Column="0" Text="Наполнитель:" Margin="0,0,10,5"
                                        Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding ArmchairInfo.Filler.Name}" Margin="0,0,0,5"
-                                       Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Ящик для белья:" Margin="0,0,10,5"
-                                       Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding ArmchairInfo.HasLinenDrawer, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding ArmchairInfo.Filler.Name}" Margin="0,0,0,5"
                                        Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                            <TextBlock Grid.Row="9" Grid.Column="0" Text="Подлокотники:" Margin="0,0,10,5"
+                            <TextBlock Grid.Row="11" Grid.Column="0" Text="Ящик для белья:" Margin="0,0,10,5"
                                        Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                            <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding ArmchairInfo.HasArmrests, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                            <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding ArmchairInfo.HasLinenDrawer, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
+                                       Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                            <TextBlock Grid.Row="12" Grid.Column="0" Text="Подлокотники:" Margin="0,0,10,5"
+                                       Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Grid.Row="12" Grid.Column="1" Text="{Binding ArmchairInfo.HasArmrests, Converter={StaticResource BoolToYesNoConverter}}" Margin="0,0,0,5"
                                        Visibility="{Binding IsArmchair, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </Grid>
                     </StackPanel>
 
                     <!-- Описание -->
-                    <StackPanel>
+                    <StackPanel Visibility="{Binding IsVariantNotFound, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                         <TextBlock Text="Описание:" FontWeight="Bold" Margin="0,0,0,10"/>
                         <TextBlock Text="{Binding CurrentVariant.Product.Description}" TextWrapping="Wrap"/>
                     </StackPanel>
@@ -223,7 +341,31 @@
 
         <!-- Подвал с кнопкой добавления в корзину -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,10">
-            <Button Content="Добавить в корзину" Width="150" Height="40" FontSize="16" Click="AddToCart_Click"/>
+            <!-- Кнопка "Добавить в корзину" (видна, когда товара нет в корзине) -->
+            <Button x:Name="AddToCartButton" 
+            Content="Добавить в корзину" 
+            Width="150" Height="40" 
+            FontSize="16" 
+            Click="AddToCart_Click"
+            Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+            <!-- Элементы управления количеством (видны, когда товар в корзине) -->
+            <StackPanel Orientation="Horizontal"
+                VerticalAlignment="Center"
+                Visibility="{Binding IsInCart, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Button Content="-"
+                Width="30" Height="30"
+                Click="DecreaseQuantity_Click"/>
+
+                <TextBlock Text="{Binding CartQuantity}"
+                   Width="40"
+                   TextAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+                <Button Content="+"
+                Width="30" Height="30"
+                Click="IncreaseQuantity_Click"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

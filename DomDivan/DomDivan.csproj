@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="Image\cart_icon.png" />
     <None Remove="Image\logo.png" />
+    <None Remove="Image\picture.png" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -38,6 +39,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Image\logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Image\picture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

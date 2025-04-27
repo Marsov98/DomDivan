@@ -10,7 +10,7 @@
         Height="800" Width="1200"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:DiscountToStrikethroughConverter x:Key="DiscountToStrikethroughConverter"/>
         <local:DiscountToGrayTextConverter x:Key="DiscountToGrayTextConverter"/>

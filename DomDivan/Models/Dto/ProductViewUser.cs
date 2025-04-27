@@ -1,4 +1,7 @@
-﻿namespace DomDivan.Models;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace DomDivan.Models;
 
 public class ProductViewUser
 {
@@ -35,8 +38,27 @@ public class ProductViewUser
         } 
     }
 
+    private bool _isInCart;
+    public bool IsInCart
+    {
+        get => _isInCart;
+        set
+        {
+            _isInCart = value;
+        }
+    }
 
-    public string Photo { get; set; } = "default.jpg";
+    private int _cartQuantity;
+    public int CartQuantity
+    {
+        get => _cartQuantity;
+        set
+        {
+            _cartQuantity = value;
+        }
+    }
+
+    public string Photo { get; set; } = "/Image/picture.png";
     public virtual string? ImagePath
     {
         get

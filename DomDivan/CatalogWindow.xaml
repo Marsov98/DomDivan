@@ -15,6 +15,8 @@
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:DiscountToStrikethroughConverter x:Key="DiscountToStrikethroughConverter"/>
         <local:DiscountToGrayTextConverter x:Key="DiscountToGrayTextConverter"/>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         <Style TargetType="ListBoxItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -245,7 +247,9 @@
                     <Grid Grid.Column="1"
                           VerticalAlignment="Center"
                           Width="35"
-                          Height="35">
+                          Height="35"
+                          Cursor="Hand"
+                          MouseDown="GridIcon_MouseDown">
                         <Image Source="/Image/cart_icon.png" 
                                Width="24"
                                Height="24"/>
@@ -258,6 +262,7 @@
                                 Margin="0,15,-3,0"
                                 RenderTransformOrigin="0.154,1.136">
                             <TextBlock x:Name="CartCount"
+                                       Text="{Binding ItemsCount, Source={x:Static local:CartService.Instance}}"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
                                        Foreground="White"
@@ -272,7 +277,8 @@
             <ListBox Grid.Row="1"
                      x:Name="ListItems"
                      HorizontalContentAlignment="Stretch"
-                     VerticalAlignment="Top">
+                     VerticalAlignment="Top"
+                     SelectionChanged="ViewSelected_Click">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="{Binding ColumnCount}" />
@@ -290,6 +296,15 @@
                                     <RowDefinition Height="200"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
+
+                                <!-- Изображение товара -->
+                                <Image Grid.Row="0" 
+                                       Source="{Binding Photo}" 
+                                       Stretch="Uniform"
+                                       MaxHeight="200"
+                                       MaxWidth="250"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
 
                                 <Grid Grid.Row="1">
                                     <Grid.RowDefinitions>
@@ -344,10 +359,37 @@
                                                Text="{Binding Description}"
                                                HorizontalAlignment="Center"/>
 
-                                    <Button Content="Добавить в корзину"
-                                            Grid.Row="3"
-                                            HorizontalAlignment="Center"
-                                            Margin="5"/>
+                                    <!-- Блок кнопок корзины -->
+                                    <Grid Grid.Row="3">
+                                        <!-- Кнопка "Добавить в корзину" (видна, если товара нет в корзине) -->
+                                        <Button x:Name="AddToCartButton"
+                                                Content="Добавить в корзину"
+                                                HorizontalAlignment="Center"
+                                                Margin="5"
+                                                Click="AddToCart_Click"
+                                                Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                                        <!-- Счетчик товаров (виден, если товар в корзине) -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding IsInCart, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <Button Content="-"
+                                                    Width="30"
+                                                    Click="DecreaseQuantity_Click"
+                                                    Tag="{Binding Id}"/>
+
+                                            <TextBlock Text="{Binding CartQuantity}"
+                                                       Width="40"
+                                                       TextAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+
+                                            <Button Content="+"
+                                                    Width="30"
+                                                    Click="IncreaseQuantity_Click"
+                                                    Tag="{Binding Id}"/>
+                                        </StackPanel>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Border>

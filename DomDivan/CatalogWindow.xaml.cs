@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -186,7 +187,8 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
             Cloth = x.Variant.Cloth.Name,
             Filler = x.Sofa?.Filler?.Name ?? x.Armchair?.Filler?.Name,
             Mechanism = x.Sofa?.FoldingMechanism?.Name,
-            Photo = x.Variant.Photos.First(p => p.IsPrimary).PhotoName
+            Photo = x.Variant.Photos.First(p => p.IsPrimary).PhotoName,
+            IsInCart = false
         }).ToList();
     }
 
@@ -337,6 +339,15 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
                 _ => filtered.AsEnumerable()
             };
 
+            foreach (var item in sorted)
+            {
+                if (item != null)
+                {
+                    item.IsInCart = CartService.Instance.IsInCart(item.IdVariant);
+                    item.CartQuantity = CartService.Instance.GetItemQuantity(item.IdVariant);
+                }
+            }
+
             // Обновление коллекции
             ListItems.ItemsSource = new ObservableCollection<ProductViewUser>(sorted);
         }
@@ -371,7 +382,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         double cardWidth = 300;
         // Добавляем отступы между карточками
         double spacing = 20;
-        ColumnCount = Math.Max(1, (int)(newWidth / (cardWidth + spacing)));
+        ColumnCount = Math.Max(1, (int)((newWidth - 250) / (cardWidth + spacing)));
     }
 
     private void OnFilterSelectionChanged(object sender, EventArgs e)
@@ -379,11 +390,112 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         ApplyFilters();
     }
 
+    private void ViewSelected_Click(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var selectedItem = (sender as ListBox).SelectedItem as ProductViewUser;
+
+        if (selectedItem != null)
+        {
+            using (var db = new DomDivanContext())
+            {
+                int productId = db.Variants
+                    .Where(v => v.Id == selectedItem.IdVariant)
+                    .Select(x => x.ProductId)
+                    .FirstOrDefault();
+
+                var product = db.Products
+                    .AsNoTracking()
+                    .Include(p => p.Category)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.Color)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.Cloth)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.SofaType)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.Photos)
+                    .FirstOrDefault(p => p.Id == productId);
+
+                if (product != null)
+                {
+                    new ProductViewWindow(product, selectedItem.IdVariant).Show();
+                    this.Close();
+                }
+            }
+        }
+    }
+
+    private void AddToCart_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItem = (sender as Button).DataContext as ProductViewUser;
+
+        if (selectedItem != null)
+        {
+            using (var db = new DomDivanContext())
+            {
+                var selectedVariant = db.Variants
+                    .Include(v => v.Product)
+                        .ThenInclude(p => p.Category)
+                    .Include(v => v.Color)
+                    .Include(v => v.Cloth)
+                    .Include(v => v.SofaType)
+                    .Include(v => v.Photos)
+                    .FirstOrDefault(v => v.Id == selectedItem.IdVariant);
+
+                if (selectedVariant != null)
+                {
+                    CartService.Instance.AddToCart(selectedVariant);
+
+                    ApplyFilters();
+
+                    CartCount.Text = CartService.Instance.ItemsCount.ToString();
+                }
+            }
+        }
+    }
+
+    private void IncreaseQuantity_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItem = (sender as Button).DataContext as ProductViewUser;
+        if (selectedItem != null)
+        {
+            CartService.Instance.UpdateQuantity(selectedItem.IdVariant, CartService.Instance.GetItemQuantity(selectedItem.IdVariant) + 1);
+            CartCount.Text = CartService.Instance.ItemsCount.ToString();
+            ApplyFilters();
+        }
+    }
+
+    private void DecreaseQuantity_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItem = (sender as Button).DataContext as ProductViewUser;
+        if (selectedItem != null)
+        {
+            int newQuantity = CartService.Instance.GetItemQuantity(selectedItem.IdVariant) - 1;
+            if (newQuantity <= 0)
+            {
+                CartService.Instance.RemoveFromCart(selectedItem.IdVariant);
+            }
+            else
+            {
+                CartService.Instance.UpdateQuantity(selectedItem.IdVariant, newQuantity);
+            }
+            CartCount.Text = CartService.Instance.ItemsCount.ToString();
+            ApplyFilters();
+        }
+    }
+
+    private void GridIcon_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var cartWindow = new CartWindow();
+        cartWindow.Show();
+    }
+
     #endregion
 
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
 }
 
 #region Helper Classes
