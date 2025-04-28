@@ -340,7 +340,7 @@
         </ScrollViewer>
 
         <!-- Подвал с кнопкой добавления в корзину -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,10">
+        <StackPanel Visibility="{Binding IsVariantNotFound, Converter={StaticResource InverseBoolToVisibilityConverter}}" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,10">
             <!-- Кнопка "Добавить в корзину" (видна, когда товара нет в корзине) -->
             <Button x:Name="AddToCartButton" 
             Content="Добавить в корзину" 

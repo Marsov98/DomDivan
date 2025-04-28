@@ -11,9 +11,9 @@ public class Product
     public decimal Price { get; set; }
     public int? Discount { get; set; }
 
-    public decimal DiscountPrice => Discount.HasValue
-                    ? Price * (1 - Discount.Value / 100m)
-                    : Price;
+    public virtual decimal DiscountPrice => Discount.HasValue
+                            ? Price * (1 - Discount.Value / 100m)
+                            : Price;
 
     public List<Variant> Variants { get; set; } = new();
 }

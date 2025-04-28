@@ -5,54 +5,118 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DomDivan;
-
-/// <summary>
-/// Логика взаимодействия для CartWindow.xaml
-/// </summary>
-public partial class CartWindow : Window
+namespace DomDivan
 {
-    public CartWindow()
+    public partial class CartWindow : Window, INotifyPropertyChanged
     {
-        InitializeComponent();
-        DataContext = this;
-        RefreshCart();
-    }
+        public ObservableCollection<CartView> CartItems { get; } = new ObservableCollection<CartView>();
+        public decimal TotalPrice { get; set; }
+        public decimal TotalDiscountPrice {  get; set; }
+        public bool HasEqual { get; set; }
 
-    public ObservableCollection<CartItem> Items { get; } = new ObservableCollection<CartItem>();
-    public decimal Total => CartService.Instance.Total;
-
-    private void RefreshCart()
-    {
-        Items.Clear();
-        foreach (var item in CartService.Instance.CartItems)
+        public CartWindow()
         {
-            Items.Add(item);
+            InitializeComponent();
+            DataContext = this;
+            LoadCartItems();
         }
-        OnPropertyChanged(nameof(Total));
-    }
 
-    private void RemoveItem_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button button && button.DataContext is CartItem item)
+        private void LoadCartItems()
         {
-            CartService.Instance.RemoveFromCart(item.Variant.Id);
-            RefreshCart();
+            CartItems.Clear();
+
+            // Здесь получаем данные из CartService и преобразуем в CartView
+            foreach (var cartItem in CartService.Instance.CartItems)
+            {
+                CartItems.Add(new CartView
+                {
+                    IdVariant = cartItem.Variant.Id,
+                    Title = $"{cartItem.Variant.Product.Category.Name} \"{cartItem.Variant.Product.Name}\"",
+                    PrimaryPhoto = cartItem.Variant.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoName
+                                ?? cartItem.Variant.Photos.FirstOrDefault()?.PhotoName,
+                    Color = cartItem.Variant.Color.Name,
+                    Cloth = cartItem.Variant.Cloth.Name,
+                    SofaType = cartItem.Variant.SofaType?.Name,
+                    Price = cartItem.Variant.Product.Price,
+                    Discount = cartItem.Variant.Product.Discount,
+                    DiscountPrice = cartItem.Variant.Product.DiscountPrice,
+                    Quantity = cartItem.Quantity
+                });
+            }
+
+            TotalPrice = CartItems.Sum(item => item.Price * item.Quantity);
+            TotalDiscountPrice = CartItems.Sum(item => item.DiscountPrice * item.Quantity);
+
+            HasEqual = TotalPrice == TotalDiscountPrice;
+
+            OnPropertyChanged(nameof(TotalPrice));
+            OnPropertyChanged(nameof(TotalDiscountPrice));
+            OnPropertyChanged(nameof(HasEqual));
         }
-    }
 
-    private void Checkout_Click(object sender, RoutedEventArgs e)
-    {
-        int orderId = CartService.Instance.CreateOrder();
-        MessageBox.Show($"Заказ #{orderId} оформлен на сумму {Total:C}", "Заказ оформлен");
-        CartService.Instance.ClearCart();
-        RefreshCart();
-        Close();
-    }
+        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int variantId)
+            {
+                CartService.Instance.RemoveFromCart(variantId);
+                LoadCartItems();
+            }
+        }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        private void DecreaseQuantity_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int variantId)
+            {
+                int newQuantity = CartService.Instance.GetItemQuantity(variantId) - 1;
+                if (newQuantity <= 0)
+                {
+                    CartService.Instance.RemoveFromCart(variantId);
+                }
+                else
+                {
+                    CartService.Instance.UpdateQuantity(variantId, newQuantity);
+                }
+                LoadCartItems();
+            }
+        }
+
+        private void IncreaseQuantity_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int variantId)
+            {
+                CartService.Instance.UpdateQuantity(variantId,
+                    CartService.Instance.GetItemQuantity(variantId) + 1);
+                LoadCartItems();
+            }
+        }
+
+        private void Checkout_Click(object sender, RoutedEventArgs e)
+        {
+            if (CartItems.Count == 0)
+            {
+                MessageBox.Show("Корзина пуста", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            /*var checkoutWindow = new CheckoutWindow();
+            if (checkoutWindow.ShowDialog() == true)
+            {
+                int orderId = CartService.Instance.CreateOrder();
+                MessageBox.Show($"Заказ #{orderId} оформлен на сумму {Total:C}", "Заказ оформлен");
+                CartService.Instance.ClearCart();
+                Close();
+            }*/
+        }
+
+        private void ContinueShopping_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

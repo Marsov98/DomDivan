@@ -34,7 +34,19 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     public ObservableCollection<Filler> Fillers { get; private set; }
     public ObservableCollection<FoldingMechanism> FoldingMechanisms { get; private set; }
 
-    public bool IsSofaCategory => CurrentProduct?.CategoryId == 1; // Предполагаем, что 1 - это ID категории "Диваны"
+    public bool IsSofaCategory => _originalProduct?.Category.Name == "Диван";
+
+    public string FormattedDiscountPrice
+    {
+        get
+        {
+            if (CurrentProduct != null)
+            {
+                return CurrentProduct.DiscountPrice.ToString("C");
+            }
+            return string.Empty;
+        }
+    }
 
     public ProductEditorWindow(Product product = null)
     {
@@ -45,6 +57,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
         LoadData();
         InitializeProduct();
+        UpdateDiscountPriceDisplay();
         DataContext = this;
     }
 
@@ -258,6 +271,16 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
             OnPropertyChanged(nameof(IsSofaCategory));
             UpdateCategorySpecificFields();
         }
+    }
+
+    private void UpdateDiscountPriceDisplay()
+    {
+        OnPropertyChanged(nameof(FormattedDiscountPrice));
+    }
+
+    private void DiscountPrice_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        UpdateDiscountPriceDisplay();
     }
 
     private void CategoryField_TextChanged(object sender, TextChangedEventArgs e)

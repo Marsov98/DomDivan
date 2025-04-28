@@ -64,15 +64,17 @@
 
                 <Label Grid.Row="1" Grid.Column="2" Content="Цена:" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="1" Grid.Column="3" 
-                         Text="{Binding CurrentProduct.Price, UpdateSourceTrigger=PropertyChanged}"/>
+                         Text="{Binding CurrentProduct.Price, UpdateSourceTrigger=PropertyChanged}"
+                         TextChanged="DiscountPrice_TextChanged"/>
 
                 <Label Grid.Row="2" Grid.Column="0" Content="Скидка (%):" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="2" Grid.Column="1" 
-                         Text="{Binding CurrentProduct.Discount, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="2" Grid.Column="1"
+                         Text="{Binding CurrentProduct.Discount, UpdateSourceTrigger=PropertyChanged}"
+                         TextChanged="DiscountPrice_TextChanged"/>
 
                 <Label Grid.Row="2" Grid.Column="2" Content="Цена со скидкой:" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="2" Grid.Column="3" x:Name="DiscountPrice"
-                           Text="{Binding CurrentProduct.DiscountPrice, StringFormat=C}"/>
+                           Text="{Binding FormattedDiscountPrice}"/>
 
                 <Label Grid.Row="3" Grid.Column="0" Content="Описание:" VerticalAlignment="Top"/>
                 <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" 

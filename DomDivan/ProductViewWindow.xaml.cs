@@ -98,7 +98,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         }
     }
 
-    public int CartQuantity => CartService.Instance.GetItemQuantity(CurrentVariant?.Id ?? 0);
+    public int CartQuantity { get; set; }
 
     public List<VariantOption<Models.Color>> ColorOptions { get; } = new();
     public List<VariantOption<Cloth>> ClothOptions { get; } = new();
@@ -160,6 +160,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
                 .FirstOrDefault(p => p.Id == product.Id);
 
             CurrentVariant = Product.Variants.FirstOrDefault(v => v.Id == IdVariant);
+            UpdateCartStatus();
             InitializeVariants();
 
             // Загружаем первое изображение
@@ -332,10 +333,6 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         {
             CartService.Instance.AddToCart(CurrentVariant);
             UpdateCartStatus();
-            MessageBox.Show($"Товар \"{CurrentVariant.Product.Name}\" добавлен в корзину",
-                           "Успешно",
-                           MessageBoxButton.OK,
-                           MessageBoxImage.Information);
         }
     }
 
@@ -369,6 +366,8 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     public void UpdateCartStatus()
     {
         IsInCart = CurrentVariant != null && CartService.Instance.IsInCart(CurrentVariant.Id);
+        CartQuantity = CartService.Instance.GetItemQuantity(CurrentVariant?.Id ?? 0);
+        OnPropertyChanged(nameof(CartQuantity));
     }
 
     public void SelectedVariants()
