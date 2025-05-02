@@ -1,0 +1,139 @@
+﻿<Window x:Class="DomDivan.CheckoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Оформление заказа"
+        WindowState="Maximized"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <!-- Header по центру сверху -->
+        <Grid VerticalAlignment="Top" Height="50" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Центральная панель с заголовком -->
+            <Border Grid.Column="1" Background="#FF4081" CornerRadius="0,0,10,10" 
+                    Width="400" VerticalAlignment="Top">
+                <TextBlock Text="Оформление заказа" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Center"
+                          Margin="20,0"
+                          FontSize="18"
+                          FontWeight="Bold"
+                          Foreground="White"/>
+            </Border>
+        </Grid>
+
+        <!-- Основное содержимое -->
+        <Grid Margin="20,80,20,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Левая часть - данные клиента -->
+            <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                <GroupBox Header="Данные покупателя" FontSize="14" FontWeight="Bold">
+                    <StackPanel Margin="10">
+                        <Label Content="ФИО:"/>
+                        <TextBox Text="{Binding CurrentOrder.CustomerName, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextChanged="Validate_TextChanged"
+                                 Margin="0,0,0,10" Height="30"/>
+
+                        <Label Content="Номер телефона:"/>
+                        <TextBox Text="{Binding CurrentOrder.PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextChanged="Validate_TextChanged"
+                                 Margin="0,0,0,10" Height="30"/>
+
+                        <Label Content="Адрес доставки:"/>
+                        <TextBox Text="{Binding CurrentOrder.DeliveryAddress, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextChanged="Validate_TextChanged"
+                                 Margin="0,0,0,10" Height="30"/>
+
+                        <Label Content="Желаемая дата доставки:"/>
+                        <DatePicker SelectedDate="{Binding CurrentOrder.DeliveryDate, UpdateSourceTrigger=PropertyChanged}" 
+                                    SelectedDateChanged="Validate_SelectedDateChanged"
+                                    Margin="0,0,0,10" Height="30"/>
+
+                        <Label Content="Комментарий (необязательно):"/>
+                        <TextBox Text="{Binding CurrentOrder.Comments}" 
+                                Margin="0,0,0,10" Height="80" 
+                                AcceptsReturn="True" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+
+            <!-- Правая часть - товары и итоги -->
+            <StackPanel Grid.Column="1">
+                <GroupBox Header="Состав заказа" FontSize="14" FontWeight="Bold">
+                    <DataGrid ItemsSource="{Binding CurrentOrder.Items}" 
+                             AutoGenerateColumns="False"
+                             CanUserAddRows="False"
+                             IsReadOnly="True"
+                             HeadersVisibility="Column"
+                             Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="Auto"/>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding Variant.Product.Name}" Width="*"/>
+                            <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}"/>
+                            <DataGridTextColumn Header="Цена" Binding="{Binding UnitPrice, StringFormat={}{0:C}}"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:C}}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <!-- Итоговая информация -->
+                <Border Background="#F5F5F5" Margin="0,20,0,0" Padding="20" CornerRadius="5">
+                    <StackPanel>
+                        <TextBlock Text="Итоговая информация:" 
+                                  FontSize="16" 
+                                  FontWeight="Bold"
+                                  Margin="0,0,0,10"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Количество товаров:" Width="200"/>
+                            <TextBlock Text="{Binding TotalQuantity}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Сумма заказа:" Width="200"/>
+                            <TextBlock Text="{Binding CurrentOrder.TotalPrice, StringFormat={}{0:C}}" 
+                                      FontWeight="Bold" FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Кнопки действий -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                    <Button Content="← Назад" 
+                            Width="120" 
+                            Height="40"
+                            Margin="0,0,10,0"
+                            Click="BackButton_Click"/>
+
+                    <Button Content="Продолжить покупки" 
+                            Width="180" 
+                            Height="40"
+                            Margin="0,0,10,0"
+                            Click="ContinueShoppingButton_Click"/>
+
+                    <Button Content="Оформить заказ" 
+                            Width="180" 
+                            Height="40"
+                            FontWeight="Bold"
+                            Background="#FF4081"
+                            Foreground="White"
+                            Click="PlaceOrderButton_Click"
+                            IsEnabled="{Binding IsOrderValid}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

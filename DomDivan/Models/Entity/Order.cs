@@ -13,5 +13,5 @@ public class Order
     public string? Comments { get; set; }
 
     public List<OrderItem> Items { get; set; } = new();
-    public decimal TotalPrice => Items.Sum(i => i.UnitPrice * i.Quantity);
+    public virtual decimal TotalPrice => Items.Sum(i => i.TotalPrice);
 }

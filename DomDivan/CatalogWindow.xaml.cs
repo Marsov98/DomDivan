@@ -488,6 +488,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
     {
         var cartWindow = new CartWindow();
         cartWindow.Show();
+        this.Close();
     }
 
     #endregion

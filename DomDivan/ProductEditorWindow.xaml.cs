@@ -28,7 +28,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     public Armchair Armchair { get; private set; }
 
     public ObservableCollection<Category> Categories { get; private set; }
-    public ObservableCollection<Models.Color> Colors { get; private set; }
+    public ObservableCollection<Models.ColorVariant> Colors { get; private set; }
     public ObservableCollection<Cloth> Cloths { get; private set; }
     public ObservableCollection<SofaType> SofaTypes { get; private set; }
     public ObservableCollection<Filler> Fillers { get; private set; }
@@ -64,7 +64,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     private void LoadData()
     {
         Categories = new ObservableCollection<Category>(_context.Categories.ToList());
-        Colors = new ObservableCollection<Models.Color>(_context.Colors.ToList());
+        Colors = new ObservableCollection<Models.ColorVariant>(_context.Colors.ToList());
         Cloths = new ObservableCollection<Cloth>(_context.Cloths.ToList());
         SofaTypes = new ObservableCollection<SofaType>(_context.SofaTypes.ToList());
         Fillers = new ObservableCollection<Filler>(_context.Fillers.ToList());

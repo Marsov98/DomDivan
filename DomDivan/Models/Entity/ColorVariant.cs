@@ -1,6 +1,6 @@
 ﻿namespace DomDivan.Models;
 
-public class Color
+public class ColorVariant
 {
     public int Id { get; set; }
     public string Name { get; set; }

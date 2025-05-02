@@ -141,8 +141,8 @@ public partial class AdminProductsWindow : Window
 
     private void ManageParameters_Click(object sender, RoutedEventArgs e)
     {
-        /*var paramsWindow = new ParametersManagementWindow();
-        paramsWindow.ShowDialog();*/
+        new ParametersWindow().Show();
+        this.Close();
     }
 
     private async void ProductsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

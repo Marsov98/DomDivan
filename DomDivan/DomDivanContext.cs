@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DomDivan.Models;
-using System.Windows;
 
 namespace DomDivan;
 
@@ -12,7 +11,7 @@ public class DomDivanContext : DbContext
     public DbSet<Armchair> Armchairs { get; set; }
     public DbSet<Bed> Beds { get; set; }
     public DbSet<Variant> Variants { get; set; }
-    public DbSet<Color> Colors { get; set; }
+    public DbSet<ColorVariant> Colors { get; set; }
     public DbSet<Cloth> Cloths { get; set; }
     public DbSet<SofaType> SofaTypes { get; set; }
     public DbSet<Filler> Fillers { get; set; }
@@ -20,6 +19,9 @@ public class DomDivanContext : DbContext
     public DbSet<PhotoProduct> Photos { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

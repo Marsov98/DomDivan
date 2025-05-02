@@ -22,7 +22,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     private int _currentPhotoIndex = 0;
     private bool _isInCart;
     private bool _isVariantNotFound;
-    private Models.Color _selectedColor;
+    private Models.ColorVariant _selectedColor;
     private Cloth _selectedCloth;
     private SofaType? _selectedSofaType;
 
@@ -68,7 +68,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         }
     }
 
-    public Models.Color SelectedColor
+    public Models.ColorVariant SelectedColor
     {
         get => _selectedColor;
         set
@@ -100,7 +100,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
 
     public int CartQuantity { get; set; }
 
-    public List<VariantOption<Models.Color>> ColorOptions { get; } = new();
+    public List<VariantOption<Models.ColorVariant>> ColorOptions { get; } = new();
     public List<VariantOption<Cloth>> ClothOptions { get; } = new();
     public List<VariantOption<SofaType>> SofaTypeOptions { get; } = new();
 
@@ -185,7 +185,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         // Группируем варианты по цветам
         var colorGroups = Product.Variants
             .GroupBy(v => v.Color)
-            .Select(g => new VariantOption<Models.Color>
+            .Select(g => new VariantOption<Models.ColorVariant>
             {
                 Color = g.Key,
                 IsSelected = g.Key.Id == CurrentVariant?.ColorId
@@ -255,7 +255,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
 
     private void ColorVariation_Checked(object sender, RoutedEventArgs e)
     {
-        if (sender is RadioButton radioButton && radioButton.DataContext is VariantOption<Models.Color> option)
+        if (sender is RadioButton radioButton && radioButton.DataContext is VariantOption<Models.ColorVariant> option)
         {
             SelectedColor = option.Color;
             SelectedVariants();

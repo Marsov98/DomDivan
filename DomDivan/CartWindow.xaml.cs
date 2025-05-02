@@ -98,6 +98,11 @@ namespace DomDivan
                 return;
             }
 
+            new CheckoutWindow().Show();
+            this.Close();
+
+            //GenerateWord.GenerateWordReceipt(CartItems);
+
             /*var checkoutWindow = new CheckoutWindow();
             if (checkoutWindow.ShowDialog() == true)
             {
@@ -110,7 +115,8 @@ namespace DomDivan
 
         private void ContinueShopping_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            new CatalogWindow().Show();
+            this.Close();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

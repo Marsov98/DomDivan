@@ -10,5 +10,12 @@ public class OrderItem
     public Variant Variant { get; set; }
 
     public int Quantity { get; set; }
-    public int UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; }
+    public virtual decimal TotalPrice 
+    { 
+        get
+        {
+            return Quantity * UnitPrice; 
+        }
+    }
 }

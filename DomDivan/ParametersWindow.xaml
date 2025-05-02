@@ -1,0 +1,245 @@
+﻿<Window x:Class="DomDivan.ParametersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DomDivan"
+        mc:Ignorable="d"
+        Title="Управление параметрами" 
+        Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <local:HexToBrushConverter x:Key="HexToBrushConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Padding="10,10,0,0" Grid.Row="0">
+            <Button Content="Назад" HorizontalAlignment="Left" Width="80" Height="30" Click="BackButton_Click"/>
+        </Border>
+
+        <Grid Margin="10" Grid.Row="1">
+            <TabControl>
+                <!-- Вкладка тканей -->
+                <TabItem Header="Ткани">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox x:Name="NewClothTextBox" Width="200" Margin="0,0,10,0"/>
+                            <Button Content="Добавить ткань" Width="120" Click="AddCloth_Click"/>
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="1" x:Name="ClothsDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              MouseDoubleClick="ClothsDataGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Изменить" Click="EditCloth_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                                <Button Content="Удалить" Click="DeleteCloth_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <!-- Вкладка цветов -->
+                <TabItem Header="Цвета">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox x:Name="NewColorNameTextBox" Width="200" Margin="0,0,10,0"/>
+                            <TextBox x:Name="NewColorHexTextBox" Width="100" Margin="0,0,10,0"/>
+                            <Button Content="Добавить цвет" Width="120" Click="AddColor_Click"/>
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="1" x:Name="ColorsDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              MouseDoubleClick="ColorsDataGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                                <DataGridTemplateColumn Header="Цвет" Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Width="20" Height="20" 
+                                                Background="{Binding HexID, Converter={StaticResource HexToBrushConverter}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="HEX" Binding="{Binding HexID}"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Изменить" Click="EditColor_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                                <Button Content="Удалить" Click="DeleteColor_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <!-- Вкладка наполнителей -->
+                <TabItem Header="Наполнители">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox x:Name="NewFillerTextBox" Width="200" Margin="0,0,10,0"/>
+                            <Button Content="Добавить наполнитель" Width="150" Click="AddFiller_Click"/>
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="1" x:Name="FillersDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              MouseDoubleClick="FillersDataGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Изменить" Click="EditFiller_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                                <Button Content="Удалить" Click="DeleteFiller_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <!-- Вкладка механизмов трансформации -->
+                <TabItem Header="Механизмы">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox x:Name="NewMechanismTextBox" Width="200" Margin="0,0,10,0"/>
+                            <Button Content="Добавить механизм" Width="150" Click="AddMechanism_Click"/>
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="1" x:Name="MechanismsDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              MouseDoubleClick="MechanismsDataGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Изменить" Click="EditMechanism_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                                <Button Content="Удалить" Click="DeleteMechanism_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <!-- Вкладка типов диванов -->
+                <TabItem Header="Типы диванов">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox x:Name="NewSofaTypeTextBox" Width="200" Margin="0,0,10,0"/>
+                            <Button Content="Добавить тип" Width="150" Click="AddSofaType_Click"/>
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="1" x:Name="SofaTypesDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              MouseDoubleClick="SofaTypesDataGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Изменить" Click="EditSofaType_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                                <Button Content="Удалить" Click="DeleteSofaType_Click"
+                                                    Tag="{Binding}"
+                                                    Margin="2"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
+</Window>
