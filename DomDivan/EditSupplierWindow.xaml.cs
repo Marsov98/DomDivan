@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DomDivan.Models;
+using System.Windows;
 
 namespace DomDivan;
 
@@ -20,6 +21,19 @@ public partial class EditSupplierWindow : Window
         {
             MessageBox.Show("Все поля должны быть заполнены!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
+        }
+
+        var supplier = new Supplier
+        {
+            CompanyName = CompanyNameTextBox.Text,
+            PhoneNumber = PhoneNumberTextBox.Text,
+            ContactPerson = ContactPersonTextBox.Text
+        };
+
+        using(var context = new DomDivanContext())
+        {
+            context.Suppliers.Add(supplier);
+            context.SaveChanges();
         }
 
         DialogResult = true;

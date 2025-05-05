@@ -1,0 +1,38 @@
+﻿<Window x:Class="DomDivan.MainMenuWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DomDivan"
+        mc:Ignorable="d"
+        Title="Управление складом" 
+        Height="400" Width="600"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" Text="Управление складом" 
+                   FontSize="24" FontWeight="Bold"
+                   HorizontalAlignment="Center" Margin="0,20"/>
+
+        <!-- Кнопки навигации -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button x:Name="SuppliesButton" Content="Поставки" Margin="10,0,10,0"
+                    Click="SuppliesButton_Click"
+                    FontSize="15"/>
+
+            <Button x:Name="OrdersButton" Content="Заказы" Margin="10,0,10,0"
+                    Click="OrdersButton_Click"
+                    FontSize="15"/>
+
+            <Button x:Name="ProductsButton" Content="Товары" Margin="10,0,10,0"
+                    Click="ProductsButton_Click"
+                    FontSize="15"/>
+        </StackPanel>
+    </Grid>
+</Window>

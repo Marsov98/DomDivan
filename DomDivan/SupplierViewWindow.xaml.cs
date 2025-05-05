@@ -25,6 +25,7 @@ public partial class SupplierViewWindow : Window
     {
         try
         {
+            SuppliersListBox.ItemsSource = null;
             _suppliers = new ObservableCollection<Supplier>(_context.Suppliers.ToList());
             SuppliersListBox.ItemsSource = _suppliers;
         }

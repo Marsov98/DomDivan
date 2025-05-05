@@ -19,9 +19,11 @@ public class DomDivanContext : DbContext
     public DbSet<PhotoProduct> Photos { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Supply> Supplies { get; set; }
+    public DbSet<ProductInSupply> ProductsInSupply { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

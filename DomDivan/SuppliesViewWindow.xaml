@@ -1,0 +1,107 @@
+﻿<Window x:Class="DomDivan.SuppliesViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DomDivan"
+        mc:Ignorable="d"
+        Title="Просмотр поставок" 
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="597*"/>
+            <ColumnDefinition Width="383*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Панель управления -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10" Grid.ColumnSpan="2">
+            <Label Content="Поиск:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBox x:Name="SearchTextBox" Width="200" Margin="0,0,20,0"
+                    TextChanged="SearchTextBox_TextChanged"/>
+
+            <Label Content="Сортировка:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <ComboBox x:Name="SortComboBox" Width="150" Margin="0,0,20,0"
+                     SelectionChanged="SortComboBox_SelectionChanged">
+                <ComboBoxItem Content="По дате (новые)"/>
+                <ComboBoxItem Content="По дате (старые)"/>
+                <ComboBoxItem Content="По сумме (↑)"/>
+                <ComboBoxItem Content="По сумме (↓)"/>
+            </ComboBox>
+
+            <Button Content="Обновить" Click="RefreshButton_Click" Padding="10,2"/>
+            
+            <Button Content="Новая поставка" Click="NewSupplyButton_Click" Padding="10,2"/>
+            
+            <Button Content="Потсавщики" Click="ViewSupplierButton_Click" Padding="10,2"/>
+        </StackPanel>
+
+        <!-- Статистика -->
+        <TextBlock Grid.Row="1" x:Name="StatsTextBlock" Margin="0,0,0,10" FontWeight="Bold" Grid.ColumnSpan="2"/>
+
+        <!-- Список поставок -->
+        <ListView Grid.Row="2" x:Name="SuppliesListView" SelectionMode="Single" Grid.ColumnSpan="2">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Expander Margin="0,5,0,5">
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Id}" Width="50" Margin="5,0" FontWeight="Bold"/>
+
+                                <StackPanel Margin="10,0">
+                                    <TextBlock Text="{Binding Supplier.CompanyName}" FontWeight="Bold"/>
+                                    <TextBlock>
+                                        <Run Text="{Binding Supplier.ContactPerson}"/>
+                                        <Run Text=", "/>
+                                        <Run Text="{Binding Supplier.PhoneNumber}"/>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <TextBlock Text="{Binding SupplyDate, StringFormat='{}Дата: {0:dd.MM.yyyy}'}" 
+                                           Margin="20,0" VerticalAlignment="Center"/>
+
+                                <TextBlock Text="{Binding TotalPrice, StringFormat='{}Сумма: {0:C}'}" 
+                                           Margin="20,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Expander.Header>
+
+                        <ItemsControl ItemsSource="{Binding ProductInSupply}" Margin="10,5">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="0,0,0,5" Padding="0,0,0,5">
+                                        <StackPanel>
+                                            <TextBlock>
+                                                <Run Text="{Binding Variant.Product.Category.Name, Mode=OneWay}" FontWeight="Bold"/>
+                                                <Run Text=" - "/>
+                                                <Run Text="{Binding Variant.Product.Name, Mode=OneWay}" FontWeight="Bold"/>
+                                                <Run Text=" - "/>
+                                                <Run Text="{Binding Variant.FullName, Mode=OneWay}"/>
+                                            </TextBlock>
+
+                                            <StackPanel Orientation="Horizontal" Margin="10,5,0,0">
+                                                <TextBlock Text="{Binding Quantity}" Width="50"/>
+                                                <TextBlock Text=" × " Margin="5,0"/>
+                                                <TextBlock Text="{Binding Price, StringFormat='{}{0:C}'}" Width="100"/>
+                                                <TextBlock Text=" = " Margin="5,0"/>
+                                                <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>
