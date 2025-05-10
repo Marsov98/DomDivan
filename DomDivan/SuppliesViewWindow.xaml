@@ -55,14 +55,14 @@
                     <Expander Margin="0,5,0,5">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Id}" Width="50" Margin="5,0" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding SupplyId}" Width="50" Margin="5,0" FontWeight="Bold"/>
 
                                 <StackPanel Margin="10,0">
-                                    <TextBlock Text="{Binding Supplier.CompanyName}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding CompanyName}" FontWeight="Bold"/>
                                     <TextBlock>
-                                        <Run Text="{Binding Supplier.ContactPerson}"/>
+                                        <Run Text="{Binding ContactPerson}"/>
                                         <Run Text=", "/>
-                                        <Run Text="{Binding Supplier.PhoneNumber}"/>
+                                        <Run Text="{Binding PhoneNumber}"/>
                                     </TextBlock>
                                 </StackPanel>
 
@@ -80,11 +80,9 @@
                                     <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Margin="0,0,0,5" Padding="0,0,0,5">
                                         <StackPanel>
                                             <TextBlock>
-                                                <Run Text="{Binding Variant.Product.Category.Name, Mode=OneWay}" FontWeight="Bold"/>
+                                                <Run Text="{Binding ProductTitle, Mode=OneWay}" FontWeight="Bold"/>
                                                 <Run Text=" - "/>
-                                                <Run Text="{Binding Variant.Product.Name, Mode=OneWay}" FontWeight="Bold"/>
-                                                <Run Text=" - "/>
-                                                <Run Text="{Binding Variant.FullName, Mode=OneWay}"/>
+                                                <Run Text="{Binding VariantTitle, Mode=OneWay}"/>
                                             </TextBlock>
 
                                             <StackPanel Orientation="Horizontal" Margin="10,5,0,0">

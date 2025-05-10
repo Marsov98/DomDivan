@@ -16,6 +16,7 @@ public partial class MainMenuWindow : Window
     {
         var suppliesWindow = new SuppliesViewWindow();
         suppliesWindow.Show();
+        this.Close();
     }
 
     private void OrdersButton_Click(object sender, RoutedEventArgs e)
@@ -28,5 +29,6 @@ public partial class MainMenuWindow : Window
     {
         var productsWindow = new AdminProductsWindow(); // Замените на ваше окно товаров
         productsWindow.Show();
+        this.Close();
     }
 }

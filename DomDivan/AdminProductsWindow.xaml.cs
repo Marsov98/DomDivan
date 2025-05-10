@@ -1,26 +1,17 @@
 ﻿using DomDivan.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace DomDivan;
 
 /// <summary>
 /// Логика взаимодействия для AdminProductsWindow.xaml
 /// </summary>
-public partial class AdminProductsWindow : Window
+public partial class AdminProductsWindow : Window, INotifyPropertyChanged
 {
     private readonly DomDivanContext _context;
     private List<ProductViewAdmin> _allProducts;
@@ -41,6 +32,7 @@ public partial class AdminProductsWindow : Window
 
         ApplyFiltersAndSort();
         StatusTextBlock.Text = $"Загружено товаров: {_allProducts.Count}";
+        LowQuantityCount.Text = $"{_allProducts.SelectMany(p => p.Variants).Count(v => v.StockQuantity < 5)}";
     }
 
     private async Task<List<ProductViewAdmin>> LoadProductsAsync()
@@ -188,4 +180,13 @@ public partial class AdminProductsWindow : Window
         new LoginWindow().Show();
         this.Close();
     }
+
+    private void GridIcon_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        new LowStockNotificationWindow().Show();
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

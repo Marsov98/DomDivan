@@ -1,6 +1,6 @@
 ﻿namespace DomDivan.Models;
 
-public class SupplyProductInfo
+public class ProductShortInfo
 {
     public int ProductId { get; set; }
 
@@ -13,5 +13,5 @@ public class SupplyProductInfo
         } 
     }
 
-    public List<SupplyVariantInfo> SupplyVariants { get; set; }
+    public List<VariantShortInfo> SupplyVariants { get; set; }
 }

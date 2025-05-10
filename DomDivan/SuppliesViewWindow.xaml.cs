@@ -11,7 +11,7 @@ namespace DomDivan;
 public partial class SuppliesViewWindow : Window
 {
     private readonly DomDivanContext _context;
-    private List<Supply> _allSupplies = new List<Supply>();
+    private List<SupplyView> _allSupplies = new List<SupplyView>();
 
     public SuppliesViewWindow()
     {
@@ -27,15 +27,37 @@ public partial class SuppliesViewWindow : Window
             _allSupplies = _context.Supplies
                 .Include(s => s.Supplier)
                 .Include(s => s.ProductInSupply)
-                .ThenInclude(p => p.Variant)
-                .ThenInclude(v => v.Product)
-                .ThenInclude(p => p.Category)
+                    .ThenInclude(p => p.Variant)
+                    .ThenInclude(v => v.Product)
+                    .ThenInclude(p => p.Category)
                 .Include(s => s.ProductInSupply)
-                .ThenInclude(p => p.Variant)
-                .ThenInclude(v => v.Color)
+                    .ThenInclude(p => p.Variant)
+                    .ThenInclude(v => v.Color)
                 .Include(s => s.ProductInSupply)
-                .ThenInclude(p => p.Variant)
-                .ThenInclude(v => v.Cloth)
+                    .ThenInclude(p => p.Variant)
+                    .ThenInclude(v => v.Cloth)
+                .Include(s => s.ProductInSupply)
+                    .ThenInclude(p => p.Variant)
+                    .ThenInclude(v => v.SofaType)
+                .Select(item => new SupplyView
+                {
+                    SupplyId = item.Id,
+                    CompanyName = item.Supplier.CompanyName,
+                    ContactPerson = item.Supplier.ContactPerson,
+                    PhoneNumber = item.Supplier.PhoneNumber,
+                    SupplyDate = item.SupplyDate,
+                    ProductInSupply = item.ProductInSupply.Select(p => new SupplyItemView
+                    {
+                        ProductId = p.Variant.ProductId,
+                        ProductTitle = $"{p.Variant.Product.Category.Name} \"{p.Variant.Product.Name}\"",
+                        VariantId = p.Variant.Id,
+                        VariantTitle = p.Variant.SofaType == null ?
+                                        $"{p.Variant.Color.Name} {p.Variant.Cloth.Name}" :
+                                        $"{p.Variant.Color.Name}, {p.Variant.Cloth.Name}, {p.Variant.SofaType.Name}",
+                        Quantity = p.Quantity,
+                        Price = p.Price
+                    }).ToList()
+                })
                 .ToList();
 
             ApplySearchAndSort();
@@ -57,10 +79,10 @@ public partial class SuppliesViewWindow : Window
         {
             var searchText = SearchTextBox.Text.ToLower();
             filtered = filtered.Where(s =>
-                s.Id.ToString().Contains(searchText) ||
-                s.Supplier.CompanyName.ToLower().Contains(searchText) ||
-                s.Supplier.ContactPerson.ToLower().Contains(searchText) ||
-                s.Supplier.PhoneNumber.Contains(searchText));
+                s.SupplyId.ToString().Contains(searchText) ||
+                s.CompanyName.ToLower().Contains(searchText) ||
+                s.ContactPerson.ToLower().Contains(searchText) ||
+                s.PhoneNumber.Contains(searchText));
         }
 
         // Сортировка
@@ -116,12 +138,10 @@ public partial class SuppliesViewWindow : Window
     private void NewSupplyButton_Click(object sender, RoutedEventArgs e)
     {
         new AddSupplyWindow().Show();
-        this.Close();
     }
 
     private void ViewSupplierButton_Click(object sender, RoutedEventArgs e)
     {
         new SupplierViewWindow().Show();
-        this.Close();
     }
 }

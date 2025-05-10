@@ -72,13 +72,7 @@ public partial class SupplierViewWindow : Window
     {
         if (SuppliersListBox.SelectedItem is Supplier selectedSupplier)
         {
-            var editWindow = new EditSupplierWindow
-            {
-                Title = "Редактирование поставщика",
-                CompanyNameTextBox = { Text = selectedSupplier.CompanyName },
-                ContactPersonTextBox = { Text = selectedSupplier.ContactPerson },
-                PhoneNumberTextBox = { Text = selectedSupplier.PhoneNumber }
-            };
+            var editWindow = new EditSupplierWindow(selectedSupplier);
 
             if (editWindow.ShowDialog() == true)
             {

@@ -103,10 +103,10 @@
                 <DataGrid Grid.Row="1" x:Name="ProductsDataGrid" AutoGenerateColumns="False"
                          CanUserAddRows="False" CanUserDeleteRows="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Товар" Binding="{Binding ProductName}" Width="*"/>
-                        <DataGridTextColumn Header="Вариация" Binding="{Binding VariantName}" Width="*"/>
+                        <DataGridTextColumn Header="Товар" Binding="{Binding ProductTitle}" Width="*"/>
+                        <DataGridTextColumn Header="Вариация" Binding="{Binding VariantTitle}" Width="*"/>
                         <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="Auto"/>
-                        <DataGridTextColumn Header="Цена за ед." Binding="{Binding PurchasePrice, StringFormat={}{0:C}}" Width="Auto"/>
+                        <DataGridTextColumn Header="Цена за ед." Binding="{Binding Price, StringFormat={}{0:C}}" Width="Auto"/>
                         <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:C}}" Width="Auto"/>
                         <DataGridTemplateColumn Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>

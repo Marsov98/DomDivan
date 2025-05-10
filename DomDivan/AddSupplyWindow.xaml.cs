@@ -12,9 +12,10 @@ namespace DomDivan;
 public partial class AddSupplyWindow : Window
 {
     private readonly DomDivanContext _context;
+    private ObservableCollection<SupplyItemView> _productsInSupplyView = new ObservableCollection<SupplyItemView>();
     private ObservableCollection<ProductInSupply> _productsInSupply = new ObservableCollection<ProductInSupply>();
     private List<Category> _categories = new List<Category>();
-    private List<SupplyProductInfo> _productsInfo = new List<SupplyProductInfo>();
+    private List<ProductShortInfo> _productsInfo = new List<ProductShortInfo>();
     private List<Supplier> _suppliers = new List<Supplier>();
 
     public AddSupplyWindow()
@@ -22,7 +23,7 @@ public partial class AddSupplyWindow : Window
         InitializeComponent();
         _context = new DomDivanContext();
         LoadData();
-        ProductsDataGrid.ItemsSource = _productsInSupply;
+        ProductsDataGrid.ItemsSource = _productsInSupplyView;
     }
 
     private void LoadData()
@@ -33,6 +34,12 @@ public partial class AddSupplyWindow : Window
         SupplierComboBox.DisplayMemberPath = "CompanyName";
         SupplierComboBox.SelectedValuePath = "Id";
 
+        // Загрузка категорий
+        _categories = _context.Categories.ToList();
+        CategoryComboBox.ItemsSource = _categories;
+        CategoryComboBox.DisplayMemberPath = "Name";
+        CategoryComboBox.SelectedValuePath = "Id";
+
         // Загрузка товаров и их вариаций
         _productsInfo = _context.Products
             .Include(p => p.Category)
@@ -42,12 +49,12 @@ public partial class AddSupplyWindow : Window
                 .ThenInclude(v => v.Cloth)
             .Include(p => p.Variants)
                 .ThenInclude(v => v.SofaType)
-            .Select(p => new SupplyProductInfo
+            .Select(p => new ProductShortInfo
             {
                 ProductId = p.Id,
                 ProductCategory = p.Category.Name,
                 ProductName = p.Name,
-                SupplyVariants = p.Variants.Select(v => new SupplyVariantInfo
+                SupplyVariants = p.Variants.Select(v => new VariantShortInfo
                 {
                     VariantId = v.Id,
                     VariantTitle = v.SofaType == null ? 
@@ -56,10 +63,6 @@ public partial class AddSupplyWindow : Window
                 }).ToList()
             })
             .ToList();
-
-        ProductComboBox.ItemsSource = _productsInfo;
-        ProductComboBox.DisplayMemberPath = "ProductTitle";
-        ProductComboBox.SelectedValuePath = "ProductId";
     }
 
     private void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -67,6 +70,8 @@ public partial class AddSupplyWindow : Window
         if (CategoryComboBox.SelectedItem is Category selectedCategory)
         {
             ProductComboBox.ItemsSource = _productsInfo.Where(p => p.ProductCategory == selectedCategory.Name);
+            ProductComboBox.DisplayMemberPath = "ProductTitle";
+            ProductComboBox.SelectedValuePath = "ProductId";
             ProductComboBox.SelectedIndex = -1;
             VariantComboBox.ItemsSource = null;
         }
@@ -74,7 +79,7 @@ public partial class AddSupplyWindow : Window
 
     private void ProductComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ProductComboBox.SelectedItem is SupplyProductInfo selectedProduct)
+        if (ProductComboBox.SelectedItem is ProductShortInfo selectedProduct)
         {
             VariantComboBox.ItemsSource = selectedProduct.SupplyVariants;
             VariantComboBox.DisplayMemberPath = "VariantTitle";
@@ -99,11 +104,11 @@ public partial class AddSupplyWindow : Window
             return;
         }
 
-        var variantInfo = (SupplyVariantInfo)VariantComboBox.SelectedItem;
-        var productInfo = (SupplyProductInfo)ProductComboBox.SelectedItem;
+        var variantInfo = (VariantShortInfo)VariantComboBox.SelectedItem;
+        var productInfo = (ProductShortInfo)ProductComboBox.SelectedItem;
 
         // Проверяем, не добавлен ли уже этот вариант товара
-        var existingItem = _productsInSupply.FirstOrDefault(p => p.VariantId == variantInfo.VariantId);
+        var existingItem = _productsInSupplyView.FirstOrDefault(p => p.VariantId == variantInfo.VariantId);
         if (existingItem != null)
         {
             existingItem.Quantity += quantity;
@@ -111,20 +116,14 @@ public partial class AddSupplyWindow : Window
         }
         else
         {
-            _productsInSupply.Add(new ProductInSupply
+            _productsInSupplyView.Add(new SupplyItemView
             {
+                ProductId = productInfo.ProductId,
+                ProductTitle = productInfo.ProductTitle,
                 VariantId = variantInfo.VariantId,
+                VariantTitle = variantInfo.VariantTitle,
                 Quantity = quantity,
-                Price = price,
-                Variant = new Variant
-                {
-                    Id = variantInfo.VariantId,
-                    Product = new Product
-                    {
-                        Id = productInfo.ProductId,
-                        Name = productInfo.ProductTitle
-                    }
-                }
+                Price = price
             });
         }
     }
@@ -145,7 +144,7 @@ public partial class AddSupplyWindow : Window
             return;
         }
 
-        if (_productsInSupply.Count == 0)
+        if (_productsInSupplyView.Count == 0)
         {
             MessageBox.Show("Добавьте хотя бы один товар в поставку");
             return;
@@ -157,14 +156,38 @@ public partial class AddSupplyWindow : Window
             {
                 SupplierId = (int)SupplierComboBox.SelectedValue,
                 SupplyDate = DateTime.Now,
-                ProductInSupply = _productsInSupply.ToList()
+                ProductInSupply = _productsInSupplyView
+                .Select(item => new ProductInSupply
+                {
+                    VariantId = item.VariantId,
+                    Quantity = item.Quantity,
+                    Price = item.Price
+                })
+                .ToList()
             };
 
             _context.Supplies.Add(supply);
+
+            foreach (var item in _productsInSupplyView)
+            {
+                var variant = _context.Variants
+                    .FirstOrDefault(v => v.Id == item.VariantId);
+
+                if (variant != null)
+                {
+                    variant.StockQuantity += item.Quantity;
+                    _context.Variants.Update(variant);
+                }
+                else
+                {
+                    MessageBox.Show($"Вариация с ID {item.VariantId} не найдена!",
+                                   "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+
             _context.SaveChanges();
 
             MessageBox.Show("Поставка успешно сохранена");
-            this.DialogResult = true;
             this.Close();
         }
         catch (Exception ex)

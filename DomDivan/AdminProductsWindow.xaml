@@ -59,6 +59,32 @@
             <Button Content="Добавить товар" Click="AddProduct_Click" Margin="0,0,10,0" Padding="10,5"/>
             <Button Content="Управление параметрами" Click="ManageParameters_Click" Margin="0,0,10,0" Padding="10,5"/>
             <Button Content="Выход" HorizontalAlignment="Right" Click="ExitButton_Click"/>
+            <!-- Иконка "Корзина" с количеством товаров -->
+            <Grid Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Width="35"
+                  Height="35"
+                  Cursor="Hand"
+                  MouseDown="GridIcon_MouseDown">
+                <Image Source="/Image/cart_icon.png" 
+                       Width="24"
+                       Height="24"/>
+                <Border Background="Red"
+                        Width="20"
+                        Height="20"
+                        CornerRadius="10"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0,15,-3,0"
+                        RenderTransformOrigin="0.154,1.136">
+                    <TextBlock x:Name="LowQuantityCount"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="White"
+                               FontSize="12"
+                               FontWeight="Bold"/>
+                </Border>
+            </Grid>
         </StackPanel>
 
         <!-- Фильтры и сортировка -->
