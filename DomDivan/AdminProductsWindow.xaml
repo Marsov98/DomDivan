@@ -59,7 +59,7 @@
             <Button Content="Добавить товар" Click="AddProduct_Click" Margin="0,0,10,0" Padding="10,5"/>
             <Button Content="Управление параметрами" Click="ManageParameters_Click" Margin="0,0,10,0" Padding="10,5"/>
             <Button Content="Выход" HorizontalAlignment="Right" Click="ExitButton_Click"/>
-            <!-- Иконка "Корзина" с количеством товаров -->
+            <!-- Иконка "Уведомления" с количеством товаров -->
             <Grid Grid.Column="1"
                   VerticalAlignment="Center"
                   Width="35"

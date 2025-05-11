@@ -21,8 +21,9 @@ public partial class MainMenuWindow : Window
 
     private void OrdersButton_Click(object sender, RoutedEventArgs e)
     {
-        /*var ordersWindow = new OrdersViewWindow();
-        ordersWindow.ShowDialog();*/
+        var ordersWindow = new OrdersViewWindow();
+        ordersWindow.Show();
+        this.Close();
     }
 
     private void ProductsButton_Click(object sender, RoutedEventArgs e)
