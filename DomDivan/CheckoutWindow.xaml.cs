@@ -81,14 +81,33 @@ namespace DomDivan
                 return;
             }
 
-            // Здесь логика сохранения заказа
-            MessageBox.Show($"Заказ №{CurrentOrder.Id} успешно оформлен!\n\n" +
-                          $"Клиент: {CurrentOrder.CustomerName}\n" +
-                          $"Телефон: {CurrentOrder.PhoneNumber}\n" +
-                          $"Адрес: {CurrentOrder.DeliveryAddress}\n" +
-                          $"Дата доставки: {CurrentOrder.DeliveryDate:dd.MM.yyyy}\n" +
-                          $"Сумма заказа: {CurrentOrder.TotalPrice:C}",
-                          "Заказ оформлен", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                foreach(var item in CurrentOrder.Items)
+                {
+                    item.Id = 0;
+                    item.Variant = null;
+                }
+                using(var context = new DomDivanContext())
+                {
+                    context.Orders.Add(CurrentOrder);
+                    context.SaveChanges();
+                }
+
+                MessageBox.Show($"Заказ №{CurrentOrder.Id} успешно оформлен!\n\n" +
+                              $"Клиент: {CurrentOrder.CustomerName}\n" +
+                              $"Телефон: {CurrentOrder.PhoneNumber}\n" +
+                              $"Адрес: {CurrentOrder.DeliveryAddress}\n" +
+                              $"Дата доставки: {CurrentOrder.DeliveryDate:dd.MM.yyyy}\n" +
+                              $"Сумма заказа: {CurrentOrder.TotalPrice:C}",
+                              "Заказ оформлен", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при оформлении заказа: {ex.Message}", 
+                                "Ошибка оформления", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
 
             new CatalogWindow().Show();
             this.Close();
