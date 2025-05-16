@@ -1,38 +1,134 @@
 ﻿<Window x:Class="DomDivan.EditColorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DomDivan"
+        mc:Ignorable="d"
         Title="Редактирование цвета" 
-        Height="170" Width="350"
-        WindowStartupLocation="CenterOwner">
-    <Grid Margin="10">
+        Height="250" 
+        Width="400"
+        MinHeight="250"
+        MinWidth="400"
+        WindowStartupLocation="CenterOwner"
+        Background="#FFF5F5F5">
+
+    <Window.Resources>
+        <!-- Используем тот же стиль кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Стиль для Label -->
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,0,10,10"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Название цвета -->
-        <Label Content="Название цвета:" Grid.Row="0" Grid.Column="0"
-               VerticalAlignment="Center" Margin="0,0,10,10"/>
-        <TextBox x:Name="NameTextBox" Grid.Row="0" Grid.Column="1"
-                 Margin="0,0,0,10" VerticalAlignment="Center"/>
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="30" Height="30" Margin="0,0,10,0"/>
+                    <TextBlock Text="Редактирование цвета" 
+                             FontSize="18" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-        <!-- Цвет -->
-        <Label Content="Цвет (Hex-код):" Grid.Row="1" Grid.Column="0"
-               VerticalAlignment="Center" Margin="0,0,10,10"/>
-        <TextBox x:Name="HexTextBox" Grid.Row="1" Grid.Column="1"
-                 Margin="0,0,0,10" VerticalAlignment="Center"/>
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Кнопки -->
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" 
-                    Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Отмена" Width="80" Margin="0,0,10,0" Click="CancelButton_Click"/>
-            <Button Content="Сохранить" Width="80" Click="SaveButton_Click"/>
-        </StackPanel>
+            <!-- Название цвета -->
+            <Grid Grid.Row="0" Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Название цвета:" Grid.Column="0"/>
+                <TextBox x:Name="NameTextBox" Grid.Column="1"/>
+            </Grid>
+
+            <!-- Hex-код цвета -->
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Цвет (Hex-код):" Grid.Column="0"/>
+                <TextBox x:Name="HexTextBox" Grid.Column="1"/>
+            </Grid>
+
+            <!-- Кнопки -->
+            <StackPanel Grid.Row="3" 
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="Отмена" 
+                        Style="{StaticResource ModernButton}"
+                        Width="100"
+                        Margin="0,0,15,0" 
+                        Click="CancelButton_Click"/>
+                <Button Content="Сохранить" 
+                        Style="{StaticResource ModernButton}"
+                        Width="100"
+                        Click="SaveButton_Click"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

@@ -5,26 +5,136 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
-        Title="Добавление новой поставки" 
-        Height="600" Width="800"
-        WindowStartupLocation="CenterScreen">
+        Title="Добавление поставки" 
+        Height="650" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для опасных кнопок (удаление) -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#FF5252"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для текстовых полей -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+
+        <!-- Стиль для GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0 0 0 10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- Стиль для ListView -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Добавление поставки" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопка "Назад" -->
+                <Button Grid.Column="2"
+                        Content="Назад" 
+                        Style="{StaticResource ModernButton}"
+                        HorizontalAlignment="Right"
+                        Click="BackButton_Click"/>
+            </Grid>
+        </Border>
+
         <!-- Панель управления -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Назад" Width="80" Margin="0,0,10,0" Click="BackButton_Click"/>
-            <Button Content="Добавить товар" Width="120" Margin="0,0,10,0" Click="AddNewProductButton_Click"/>
-            <Button Content="Добавить поставщика" Width="150" Click="AddNewSupplierButton_Click"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+            <Button Content="Добавить товар" 
+                    Style="{StaticResource ModernButton}"
+                    Margin="0,0,10,0"
+                    Click="AddNewProductButton_Click"/>
+            <Button Content="Добавить поставщика" 
+                    Style="{StaticResource ModernButton}"
+                    Click="AddNewSupplierButton_Click"/>
         </StackPanel>
 
         <!-- Информация о поставщике -->
-        <GroupBox Grid.Row="1" Header="Информация о поставщике" Margin="0,0,0,10">
+        <GroupBox Grid.Row="2" Header="Информация о поставщике">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -35,12 +145,12 @@
                 <ComboBox Grid.Column="1" x:Name="SupplierComboBox" 
                           DisplayMemberPath="CompanyName"
                           SelectedValuePath="Id"
-                          Margin="0,0,0,5"/>
+                          FontSize="14"/>
             </Grid>
         </GroupBox>
 
         <!-- Товары в поставке -->
-        <GroupBox Grid.Row="2" Header="Товары в поставке">
+        <GroupBox Grid.Row="3" Header="Товары в поставке">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -93,37 +203,51 @@
                                      Text="0" Width="100" Margin="0,0,20,0"/>
 
                             <Button Content="Добавить" 
+                                    Style="{StaticResource ModernButton}"
                                     Click="AddProductButton_Click" 
-                                    Padding="10,2" Width="120"/>
+                                    Width="120"/>
                         </StackPanel>
                     </Grid>
                 </GroupBox>
 
-                <!-- Список добавленных товаров -->
-                <DataGrid Grid.Row="1" x:Name="ProductsDataGrid" AutoGenerateColumns="False"
-                         CanUserAddRows="False" CanUserDeleteRows="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Товар" Binding="{Binding ProductTitle}" Width="*"/>
-                        <DataGridTextColumn Header="Вариация" Binding="{Binding VariantTitle}" Width="*"/>
-                        <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="Auto"/>
-                        <DataGridTextColumn Header="Цена за ед." Binding="{Binding Price, StringFormat={}{0:C}}" Width="Auto"/>
-                        <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:C}}" Width="Auto"/>
-                        <DataGridTemplateColumn Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="Удалить" Click="RemoveProductButton_Click" Tag="{Binding}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <!-- Список добавленных товаров (заменил DataGrid на ListView) -->
+                <ListView Grid.Row="1" x:Name="ProductsListView" Margin="0,10,0,0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Товар" DisplayMemberBinding="{Binding ProductTitle}" Width="200"/>
+                            <GridViewColumn Header="Вариация" DisplayMemberBinding="{Binding VariantTitle}" Width="150"/>
+                            <GridViewColumn Header="Кол-во" DisplayMemberBinding="{Binding Quantity}" Width="80"/>
+                            <GridViewColumn Header="Цена за ед." DisplayMemberBinding="{Binding Price, StringFormat='{}{0:N2} руб.'}" Width="120"/>
+                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding TotalPrice, StringFormat='{}{0:N2} руб.'}" Width="120"/>
+                            <GridViewColumn Header="" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Удалить" 
+                                                Style="{StaticResource DangerButton}"
+                                                Click="RemoveProductButton_Click" 
+                                                Tag="{Binding}"
+                                                Padding="5,2"
+                                                Width="80"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </GroupBox>
 
         <!-- Кнопки управления -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Сохранить" Click="SaveButton_Click" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="Отмена" Click="CancelButton_Click" Padding="10,5"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Сохранить" 
+                    Style="{StaticResource ModernButton}"
+                    Click="SaveButton_Click" 
+                    Margin="0,0,10,0"
+                    Width="120"/>
+            <Button Content="Отмена" 
+                    Style="{StaticResource ModernButton}"
+                    Click="CancelButton_Click"
+                    Width="120"/>
         </StackPanel>
     </Grid>
 </Window>

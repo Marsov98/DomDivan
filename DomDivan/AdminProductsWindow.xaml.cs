@@ -175,6 +175,12 @@ public partial class AdminProductsWindow : Window, INotifyPropertyChanged
         ApplyFiltersAndSort();
     }
 
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        new MainMenuWindow().Show();
+        this.Close();
+    }
+
     private void ExitButton_Click(object sender, RoutedEventArgs e)
     {
         new LoginWindow().Show();

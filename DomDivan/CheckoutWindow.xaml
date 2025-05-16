@@ -7,32 +7,106 @@
         Title="Оформление заказа"
         WindowState="Maximized"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для текстовых полей -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Стиль для DatePicker -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Стиль для GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0 0 0 20"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
 
     <Grid>
-        <!-- Header по центру сверху -->
-        <Grid VerticalAlignment="Top" Height="50" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
+        </Grid.RowDefinitions>
 
-            <!-- Центральная панель с заголовком -->
-            <Border Grid.Column="1" Background="#FF4081" CornerRadius="0,0,10,10" 
-                    Width="400" VerticalAlignment="Top">
-                <TextBlock Text="Оформление заказа" 
-                          VerticalAlignment="Center" 
-                          HorizontalAlignment="Center"
-                          Margin="20,0"
-                          FontSize="18"
-                          FontWeight="Bold"
-                          Foreground="White"/>
-            </Border>
-        </Grid>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Оформление заказа" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопка "Выход" -->
+                <Button x:Name="ExitButton" 
+                        Grid.Column="2"
+                        Content="Выход" 
+                        Style="{StaticResource ModernButton}"
+                        Click="ExitButton_Click"/>
+            </Grid>
+        </Border>
 
         <!-- Основное содержимое -->
-        <Grid Margin="20,80,20,20">
+        <Grid Grid.Row="1" Margin="20,10,20,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -40,29 +114,29 @@
 
             <!-- Левая часть - данные клиента -->
             <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                <GroupBox Header="Данные покупателя" FontSize="14" FontWeight="Bold">
+                <GroupBox Header="Данные покупателя">
                     <StackPanel Margin="10">
-                        <Label Content="ФИО:"/>
+                        <Label Content="ФИО:" FontSize="14"/>
                         <TextBox Text="{Binding CurrentOrder.CustomerName, UpdateSourceTrigger=PropertyChanged}" 
                                  TextChanged="Validate_TextChanged"
-                                 Margin="0,0,0,10" Height="30"/>
+                                 Margin="0,0,0,10"/>
 
-                        <Label Content="Номер телефона:"/>
+                        <Label Content="Номер телефона:" FontSize="14"/>
                         <TextBox Text="{Binding CurrentOrder.PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
                                  TextChanged="Validate_TextChanged"
-                                 Margin="0,0,0,10" Height="30"/>
+                                 Margin="0,0,0,10"/>
 
-                        <Label Content="Адрес доставки:"/>
+                        <Label Content="Адрес доставки:" FontSize="14"/>
                         <TextBox Text="{Binding CurrentOrder.DeliveryAddress, UpdateSourceTrigger=PropertyChanged}" 
                                  TextChanged="Validate_TextChanged"
-                                 Margin="0,0,0,10" Height="30"/>
+                                 Margin="0,0,0,10"/>
 
-                        <Label Content="Желаемая дата доставки:"/>
+                        <Label Content="Желаемая дата доставки:" FontSize="14"/>
                         <DatePicker SelectedDate="{Binding CurrentOrder.DeliveryDate, UpdateSourceTrigger=PropertyChanged}" 
                                     SelectedDateChanged="Validate_SelectedDateChanged"
-                                    Margin="0,0,0,10" Height="30"/>
+                                    Margin="0,0,0,10"/>
 
-                        <Label Content="Комментарий (необязательно):"/>
+                        <Label Content="Комментарий (необязательно):" FontSize="14"/>
                         <TextBox Text="{Binding CurrentOrder.Comments}" 
                                 Margin="0,0,0,10" Height="80" 
                                 AcceptsReturn="True" TextWrapping="Wrap"/>
@@ -72,25 +146,28 @@
 
             <!-- Правая часть - товары и итоги -->
             <StackPanel Grid.Column="1">
-                <GroupBox Header="Состав заказа" FontSize="14" FontWeight="Bold">
+                <GroupBox Header="Состав заказа">
                     <DataGrid ItemsSource="{Binding CurrentOrder.Items}" 
                              AutoGenerateColumns="False"
                              CanUserAddRows="False"
                              IsReadOnly="True"
                              HeadersVisibility="Column"
-                             Margin="10">
+                             Margin="10"
+                             BorderThickness="0"
+                             Background="White">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="Auto"/>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding Variant.Product.Name}" Width="*"/>
-                            <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}"/>
-                            <DataGridTextColumn Header="Цена" Binding="{Binding UnitPrice, StringFormat={}{0:C}}"/>
-                            <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:C}}"/>
+                            <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="Auto" FontSize="14"/>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding Variant.Product.Name}" Width="*" FontSize="14"/>
+                            <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" FontSize="14"/>
+                            <DataGridTextColumn Header="Цена" Binding="{Binding UnitPrice, StringFormat='{}{0:N2} руб.'}" FontSize="14"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat='{}{0:N2} руб.'}" FontSize="14"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </GroupBox>
 
                 <!-- Итоговая информация -->
-                <Border Background="#F5F5F5" Margin="0,20,0,0" Padding="20" CornerRadius="5">
+                <Border Background="White" Margin="0,20,0,0" Padding="20" CornerRadius="5"
+                        BorderBrush="#FFE0E0E0" BorderThickness="1">
                     <StackPanel>
                         <TextBlock Text="Итоговая информация:" 
                                   FontSize="16" 
@@ -98,33 +175,36 @@
                                   Margin="0,0,0,10"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="Количество товаров:" Width="200"/>
-                            <TextBlock Text="{Binding TotalQuantity}" FontWeight="Bold"/>
+                            <TextBlock Text="Количество товаров:" Width="200" FontSize="14"/>
+                            <TextBlock Text="{Binding TotalQuantity}" FontWeight="Bold" FontSize="14"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="Сумма заказа:" Width="200"/>
-                            <TextBlock Text="{Binding CurrentOrder.TotalPrice, StringFormat={}{0:C}}" 
-                                      FontWeight="Bold" FontSize="16"/>
+                            <TextBlock Text="Сумма заказа:" Width="200" FontSize="14"/>
+                            <TextBlock Text="{Binding CurrentOrder.TotalPrice, StringFormat='{}{0:N2} руб.'}" 
+                                      FontWeight="Bold" FontSize="16" Foreground="#FF4081"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <!-- Кнопки действий -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                    <Button Content="← Назад" 
+                    <Button Content="Назад" 
+                            Style="{StaticResource ModernButton}"
                             Width="120" 
                             Height="40"
                             Margin="0,0,10,0"
                             Click="BackButton_Click"/>
 
                     <Button Content="Продолжить покупки" 
+                            Style="{StaticResource ModernButton}"
                             Width="180" 
                             Height="40"
                             Margin="0,0,10,0"
                             Click="ContinueShoppingButton_Click"/>
 
                     <Button Content="Оформить заказ" 
+                            Style="{StaticResource ModernButton}"
                             Width="180" 
                             Height="40"
                             FontWeight="Bold"

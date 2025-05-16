@@ -6,41 +6,86 @@
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
         Title="Корзина" 
-        Height="600" 
-        Width="900"
+        Height="650" 
+        Width="1000"
         WindowStartupLocation="CenterScreen"
-        FontFamily="Arial">
+        Background="#FFF5F5F5">
 
     <Window.Resources>
-        
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
-        
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#FF4081"/>
+
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10 5"/>
             <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-
-        <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
+        <!-- Стиль для кнопок управления количеством -->
+        <Style x:Key="QuantityButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
     </Window.Resources>
 
-    <Grid Background="#F5F5F5">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="*"/>
+            <!-- Список товаров -->
             <RowDefinition Height="Auto"/>
+            <!-- Итого -->
             <RowDefinition Height="Auto"/>
+            <!-- Кнопки -->
         </Grid.RowDefinitions>
 
-        <!-- Шапка -->
-        <Border Grid.Row="0" Background="#FFEEE8E8" Padding="15">
-            <TextBlock Text="КОРЗИНА" FontSize="20" FontWeight="Bold"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Корзина" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопка "Выход" -->
+                <Button x:Name="ExitButton" 
+                        Grid.Column="2"
+                        Content="Выход" 
+                        Style="{StaticResource ModernButton}"
+                        Click="ExitButton_Click"/>
+            </Grid>
         </Border>
 
         <!-- Список товаров -->
@@ -48,7 +93,12 @@
             <ItemsControl ItemsSource="{Binding CartItems}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="#E0E0E0" BorderThickness="0 0 0 1" Padding="10 15">
+                        <Border BorderBrush="#E0E0E0" 
+                                BorderThickness="0 0 0 1" 
+                                Padding="15"
+                                Background="White"
+                                Margin="0,0,0,10"
+                                CornerRadius="5">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120"/>
@@ -76,26 +126,42 @@
 
                                 <!-- Цена -->
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding DiscountPrice, StringFormat='{}{0:C}'}" 
+                                    <TextBlock Text="{Binding DiscountPrice, StringFormat='{}{0:N2} руб.'}" 
                                                FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Price, StringFormat='{}{0:C}'}" 
+                                    <TextBlock Text="{Binding Price, StringFormat='{}{0:N2} руб.'}" 
                                                TextDecorations="Strikethrough" Foreground="Gray"
                                                Visibility="{Binding Discount, Converter={StaticResource NullToVisibilityConverter}}"/>
                                 </StackPanel>
 
                                 <!-- Количество -->
-                                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Content="-" Width="30" Click="DecreaseQuantity_Click" 
+                                <StackPanel Grid.Column="3" 
+                                            Orientation="Horizontal" 
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center">
+                                    <Button Content="-" 
+                                            Style="{StaticResource QuantityButton}"
+                                            Click="DecreaseQuantity_Click" 
                                             Tag="{Binding IdVariant}"/>
-                                    <TextBox Text="{Binding Quantity}" Width="40" 
-                                             TextAlignment="Center" Margin="5 0" IsReadOnly="True"/>
-                                    <Button Content="+" Width="30" Click="IncreaseQuantity_Click" 
+                                    <TextBox Text="{Binding Quantity}" 
+                                             Width="40" Height="30"
+                                             TextAlignment="Center" 
+                                             Margin="5 0" 
+                                             IsReadOnly="True"
+                                             BorderBrush="#E0E0E0"
+                                             BorderThickness="1"/>
+                                    <Button Content="+" 
+                                            Style="{StaticResource QuantityButton}"
+                                            Click="IncreaseQuantity_Click" 
                                             Tag="{Binding IdVariant}"/>
                                 </StackPanel>
 
                                 <!-- Удалить -->
-                                <Button Grid.Column="4" Content="Удалить" VerticalAlignment="Center"
-                                        Click="RemoveItem_Click" Tag="{Binding IdVariant}"/>
+                                <Button Grid.Column="4" 
+                                        Content="Удалить" 
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource ModernButton}"
+                                        Click="RemoveItem_Click" 
+                                        Tag="{Binding IdVariant}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -104,28 +170,57 @@
         </ScrollViewer>
 
         <!-- Итого -->
-        <Border Grid.Row="2" Background="White" Padding="15">
+        <Border Grid.Row="2" 
+                Background="White" 
+                Padding="15"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Итого:" Margin="0 0 15 0" FontSize="16"/>
-                    <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" 
-                               TextDecorations="Strikethrough" Foreground="Gray"
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Итого:" 
+                               Margin="0 0 15 0" 
+                               FontSize="16"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:N2} руб.'}" 
+                               TextDecorations="Strikethrough" 
+                               Foreground="Gray"
+                               Margin="0 0 10 0"
+                               VerticalAlignment="Center"
                                Visibility="{Binding HasEqual, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                    <TextBlock Text="{Binding TotalDiscountPrice, StringFormat='{}{0:C}'}" 
-                               FontSize="18" FontWeight="Bold" Foreground="#FF4081"/>
+                    <TextBlock Text="{Binding TotalDiscountPrice, StringFormat='{}{0:N2} руб.'}" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Foreground="#FF4081"/>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- Кнопки -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15">
-            <Button Content="Продолжить покупки" Click="ContinueShopping_Click" Margin="0 0 15 0"/>
-            <Button Content="Оформить заказ" Click="Checkout_Click" FontWeight="Bold" Padding="20 5"/>
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="15">
+            <Button Content="Продолжить покупки" 
+                    Style="{StaticResource ModernButton}"
+                    Click="ContinueShopping_Click" 
+                    Margin="0 0 15 0"
+                    Background="Transparent"
+                    Foreground="#FF1A1A1A"
+                    BorderBrush="#FF1A1A1A"
+                    BorderThickness="1"/>
+            <Button Content="Оформить заказ" 
+                    Style="{StaticResource ModernButton}"
+                    Click="Checkout_Click" 
+                    FontWeight="Bold" 
+                    Padding="20 10"
+                    Width="180"/>
         </StackPanel>
     </Grid>
 </Window>

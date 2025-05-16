@@ -8,28 +8,127 @@
         mc:Ignorable="d"
         Title="{Binding WindowTitle}" 
         Height="800" Width="1000"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
 
-        <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="0,0,0,5"/>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
+        <!-- Стиль для опасных кнопок (удаление) -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#FF5252"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0 0 0 10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- Стиль для текстовых полей -->
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
         <Style TargetType="ComboBox">
             <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Стиль для Label -->
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="0,0,5,0"/>
         </Style>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding WindowTitle}" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопки управления -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Параметры" 
+                            Style="{StaticResource ModernButton}"
+                            Margin="0,0,10,0"
+                            Click="ManageParameters_Click"/>
+                    <Button Content="Выход" 
+                            Style="{StaticResource ModernButton}"
+                            Click="ExitButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Основная информация о товаре -->
-        <GroupBox Grid.Row="0" Header="Основная информация" Margin="0,0,0,10">
+        <GroupBox Grid.Row="1" Header="Основная информация">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -69,12 +168,13 @@
 
                 <Label Grid.Row="2" Grid.Column="0" Content="Скидка (%):" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="2" Grid.Column="1"
-                         Text="{Binding CurrentProduct.Discount, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding CurrentProduct.Discount, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                          TextChanged="DiscountPrice_TextChanged"/>
 
                 <Label Grid.Row="2" Grid.Column="2" Content="Цена со скидкой:" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="2" Grid.Column="3" x:Name="DiscountPrice"
-                           Text="{Binding FormattedDiscountPrice}"/>
+                           Text="{Binding FormattedDiscountPrice}"
+                           FontWeight="Bold"/>
 
                 <Label Grid.Row="3" Grid.Column="0" Content="Описание:" VerticalAlignment="Top"/>
                 <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" 
@@ -90,7 +190,7 @@
         </GroupBox>
 
         <!-- Вариации товара -->
-        <GroupBox Grid.Row="1" Header="Вариации товара">
+        <GroupBox Grid.Row="2" Header="Вариации товара">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding CurrentProduct.Variants}" x:Name="VariantsItemsControl">
                     <ItemsControl.ItemTemplate>
@@ -132,7 +232,7 @@
                                               DisplayMemberPath="Name"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding SofaTypeId}"
-                                              Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}"/>
+                                              Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}, UpdateSourceTrigger=PropertyChanged}"/>
 
                                     <Label Grid.Row="1" Grid.Column="2" Content="Количество на складе:" VerticalAlignment="Center"/>
                                     <TextBox Grid.Row="1" Grid.Column="3" 
@@ -145,8 +245,14 @@
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                                     <Image Source="{Binding PhotoName}" Width="50" Height="50" Margin="0,0,5,0"/>
                                                     <TextBox Text="{Binding PhotoName}" Width="200" Margin="0,0,5,0"/>
-                                                    <CheckBox Content="Основная" IsChecked="{Binding IsPrimary}" VerticalAlignment="Center"/>
-                                                    <Button Content="Удалить" Click="RemovePhoto_Click" Tag="{Binding}" CommandParameter="{Binding}" Margin="5,0,0,0"/>
+                                                    <CheckBox Content="Основная" IsChecked="{Binding IsPrimary}" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                    <Button Content="Удалить" 
+                                                            Style="{StaticResource DangerButton}"
+                                                            Click="RemovePhoto_Click" 
+                                                            Tag="{Binding}" 
+                                                            CommandParameter="{Binding}" 
+                                                            Padding="5,0"
+                                                            Width="80"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -155,12 +261,14 @@
                                     <Button Grid.Row="3" 
                                             Grid.Column="0" 
                                             Content="Добавить фото" 
+                                            Style="{StaticResource ModernButton}"
                                             Click="AddPhoto_Click" 
                                             Tag="{Binding}"
                                             Margin="0,5,0,0"/>
                                     <Button Grid.Row="3" 
                                             Grid.Column="3" 
                                             Content="Удалить вариацию" 
+                                            Style="{StaticResource DangerButton}"
                                             Click="RemoveVariant_Click" 
                                             Tag="{Binding}" 
                                             HorizontalAlignment="Right" 
@@ -174,10 +282,23 @@
         </GroupBox>
 
         <!-- Кнопки управления -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Добавить вариацию" Click="AddVariant_Click" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="Сохранить" Click="SaveButton_Click" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="Отмена" Click="CancelButton_Click" Padding="10,5"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Удалить товар" 
+                    Style="{StaticResource DangerButton}"
+                    Click="DeleteProduct_Click"
+                    Margin="0,0,10,0"
+                    Visibility="{Binding IsNewProduct, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}"/>
+            <Button Content="Добавить вариацию" 
+                    Style="{StaticResource ModernButton}"
+                    Click="AddVariant_Click" 
+                    Margin="0,0,10,0"/>
+            <Button Content="Сохранить" 
+                    Style="{StaticResource ModernButton}"
+                    Click="SaveButton_Click" 
+                    Margin="0,0,10,0"/>
+            <Button Content="Отмена" 
+                    Style="{StaticResource ModernButton}"
+                    Click="CancelButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

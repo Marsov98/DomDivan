@@ -5,164 +5,306 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
-        Title="Управление заказами" 
-        Height="700" Width="1000"
-        WindowStartupLocation="CenterScreen">
+        Title="Заказы" 
+        Height="700" 
+        Width="1000"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
     <Window.Resources>
+        <!-- Стиль кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль статусов заказов -->
         <Style x:Key="OrderStatusStyle" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Status}" Value="Новый">
-                    <Setter Property="Foreground" Value="Blue"/>
+                    <Setter Property="Foreground" Value="#FF0066CC"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="В обработке">
-                    <Setter Property="Foreground" Value="Orange"/>
+                    <Setter Property="Foreground" Value="#FFFF9900"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Доставка">
-                    <Setter Property="Foreground" Value="Green"/>
+                    <Setter Property="Foreground" Value="#FF339933"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Отменен">
-                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="Foreground" Value="#FFCC0000"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Завершен">
-                    <Setter Property="Foreground" Value="DarkGreen"/>
+                    <Setter Property="Foreground" Value="#FF006600"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Стиль для ListView -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        </Style>
+
+        <!-- Стиль для элементов ListView -->
+        <Style TargetType="ListViewItem">
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="0,5"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <!-- Стиль для TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Стиль для ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+        </Style>
     </Window.Resources>
 
-    <Grid Margin="10">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
         </Grid.RowDefinitions>
 
-        <!-- Панель управления -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBlock Text="Заказы" FontSize="20" FontWeight="Bold"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Иконка "Уведомления" -->
-            <Grid Grid.Column="1"
-                  VerticalAlignment="Center"
-                  Width="35"
-                  Height="35"
-                  Cursor="Hand"
-                  Margin="20,0,0,0"
-                  MouseDown="NotificationIcon_MouseDown">
-                <Image Source="/Image/cart_icon.png" 
-                       Width="24"
-                       Height="24"/>
-                <Border Background="Red"
-                        Width="20"
-                        Height="20"
-                        CornerRadius="10"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Margin="0,15,-3,0">
-                    <TextBlock x:Name="LowQuantityCount"
-                               Text="{Binding LowStockItemsCount}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               Foreground="White"
-                               FontSize="12"
-                               FontWeight="Bold"/>
-                </Border>
-            </Grid>
-        </StackPanel>
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Заказы" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
 
-        <!-- Панель фильтров и поиска -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Фильтр:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <ComboBox x:Name="StatusFilterComboBox" Width="150" Margin="0,0,10,0"
-                          SelectionChanged="FilterChanged">
-                    <ComboBoxItem Content="Все статусы" IsSelected="True"/>
-                    <ComboBoxItem Content="Новый"/>
-                    <ComboBoxItem Content="В обработке"/>
-                    <ComboBoxItem Content="Доставка"/>
-                    <ComboBoxItem Content="Завершен"/>
-                    <ComboBoxItem Content="Отменен"/>
-                </ComboBox>
-            </StackPanel>
-
-            <TextBox Grid.Column="1" x:Name="SearchTextBox" Margin="5,0" 
-                     TextChanged="SearchTextChanged" 
-                     Padding="5" VerticalContentAlignment="Center"/>
-
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0">
-                <Label Content="Сортировка:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <ComboBox x:Name="SortComboBox" Width="180" 
-                          SelectionChanged="SortChanged">
-                    <ComboBoxItem Content="По времени доставки (сначала ранние)"/>
-                    <ComboBoxItem Content="По времени доставки (сначала поздние)"/>
-                    <ComboBoxItem Content="По сумме (↑)"/>
-                    <ComboBoxItem Content="По сумме (↓)"/>
-                </ComboBox>
-            </StackPanel>
-
-            <Button Grid.Column="3" Content="Обновить" Padding="10,5" 
-                    Click="RefreshButton_Click"/>
-        </Grid>
-
-        <!-- Список заказов -->
-        <ListView Grid.Row="2" x:Name="OrdersListView" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  SelectionChanged="ViewSelectedOrder_Click">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="#EEE" BorderThickness="0,0,0,1" Padding="0,5">
-                        <Grid Margin="5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Первая строка: номер, время, сумма, статус -->
-                            <TextBlock Grid.Row="0" Grid.Column="0" 
-                                       Text="{Binding OrderId}" 
-                                       FontWeight="Bold" Margin="0,0,10,0"/>
-
-                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                                <TextBlock Text="{Binding DeliveryTime, StringFormat='{}Доставка: {0:dd.MM.yyyy HH:mm}'}"/>
-                                <TextBlock Text="{Binding TotalPrice, StringFormat='{} (Сумма: {0:C}'}" Margin="5,0,0,0"/>
-                                <TextBlock Text="{Binding ItemsCount, StringFormat='{}, товаров: {0})'}" Margin="2,0,0,0"/>
-                            </StackPanel>
-
-                            <TextBlock Grid.Row="0" Grid.Column="2" 
-                                       Text="{Binding Status}" 
-                                       Style="{StaticResource OrderStatusStyle}"/>
-
-                            <!-- Вторая строка: информация о клиенте -->
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Клиент:" Margin="0,5,10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" 
-                                       Text="{Binding CustomerName}" 
-                                       Margin="0,5,0,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" 
-                                       Text="{Binding CustomerPhone}" 
-                                       Margin="0,5,0,0"/>
-
-                            <!-- Третья строка: адрес -->
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Адрес:" Margin="0,5,10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                                       Text="{Binding DeliveryAddress}" 
-                                       Margin="0,5,0,0" TextWrapping="Wrap"/>
-                        </Grid>
+                <!-- Иконка уведомлений -->
+                <Grid Grid.Column="1" 
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Width="40"
+                      Height="40"
+                      Cursor="Hand"
+                      Margin="0,0,20,0"
+                      MouseDown="NotificationIcon_MouseDown">
+                    <Image Source="/white_notification_icon.png" 
+                           Width="24"
+                           Height="24"/>
+                    <Border Background="Red"
+                            Width="20"
+                            Height="20"
+                            CornerRadius="10"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top">
+                        <TextBlock x:Name="LowQuantityCount"
+                                   Text="{Binding LowStockItemsCount}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Foreground="White"
+                                   FontSize="12"
+                                   FontWeight="Bold"/>
                     </Border>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                </Grid>
+
+                <!-- Кнопки -->
+                <Button Grid.Column="2"
+                        Content="Назад" 
+                        Style="{StaticResource ModernButton}"
+                        Margin="0,0,15,0"
+                        Click="BackButton_Click"/>
+
+                <Button Grid.Column="3"
+                        Content="Выход" 
+                        Style="{StaticResource ModernButton}"
+                        Click="ExitButton_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Панель фильтров и поиска -->
+            <Border Grid.Row="0"
+                    Background="White"
+                    BorderBrush="#FFE0E0E0"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Padding="10"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Label Content="Фильтр:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <ComboBox x:Name="StatusFilterComboBox" Width="150" Margin="0,0,10,0"
+                                  SelectionChanged="FilterChanged">
+                            <ComboBoxItem Content="Все статусы" IsSelected="True"/>
+                            <ComboBoxItem Content="Новый"/>
+                            <ComboBoxItem Content="В обработке"/>
+                            <ComboBoxItem Content="Доставка"/>
+                            <ComboBoxItem Content="Завершен"/>
+                            <ComboBoxItem Content="Отменен"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <TextBox Grid.Column="1" 
+                             x:Name="SearchTextBox" 
+                             Margin="5,0" 
+                             TextChanged="SearchTextChanged" 
+                             VerticalContentAlignment="Center"/>
+
+                    <StackPanel Grid.Column="2" 
+                                Orientation="Horizontal" 
+                                VerticalAlignment="Center"
+                                Margin="10,0">
+                        <Label Content="Сортировка:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <ComboBox x:Name="SortComboBox" Width="180" 
+                                  SelectionChanged="SortChanged">
+                            <ComboBoxItem Content="По времени доставки (сначала ранние)"/>
+                            <ComboBoxItem Content="По времени доставки (сначала поздние)"/>
+                            <ComboBoxItem Content="По сумме (↑)"/>
+                            <ComboBoxItem Content="По сумме (↓)"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button Grid.Column="3" 
+                            Content="Обновить" 
+                            Style="{StaticResource ModernButton}"
+                            Click="RefreshButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Список заказов -->
+            <ListView Grid.Row="1" 
+                      x:Name="OrdersListView"
+                      SelectionChanged="ViewSelectedOrder_Click">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="White" 
+                                CornerRadius="5"
+                                Margin="0,0,0,5"
+                                Padding="10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Первая строка: номер, время, сумма, статус -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" 
+                                           Text="{Binding OrderId}" 
+                                           FontWeight="Bold" 
+                                           FontSize="14"
+                                           Margin="0,0,10,5"/>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" 
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding DeliveryTime, StringFormat='{}Доставка: {0:dd.MM.yyyy HH:mm}'}"
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding TotalPrice, StringFormat='{} (Сумма: {0:N2} руб.'}" 
+                                               Margin="5,0,0,0"
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding ItemsCount, StringFormat='{}, товаров: {0})'}" 
+                                               Margin="2,0,0,0"
+                                               FontSize="14"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" 
+                                           Text="{Binding Status}" 
+                                           Style="{StaticResource OrderStatusStyle}"/>
+
+                                <!-- Вторая строка: информация о клиенте -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" 
+                                           Text="Клиент:" 
+                                           Margin="0,5,10,0"
+                                           FontSize="14"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" 
+                                           Text="{Binding CustomerName}" 
+                                           Margin="0,5,0,0"
+                                           FontSize="14"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" 
+                                           Text="{Binding CustomerPhone}" 
+                                           Margin="0,5,0,0"
+                                           FontSize="14"/>
+
+                                <!-- Третья строка: адрес -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" 
+                                           Text="Адрес:" 
+                                           Margin="0,5,10,0"
+                                           FontSize="14"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Text="{Binding DeliveryAddress}" 
+                                           Margin="0,5,0,0" 
+                                           TextWrapping="Wrap"
+                                           FontSize="14"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
     </Grid>
 </Window>

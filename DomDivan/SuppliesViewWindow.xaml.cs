@@ -144,4 +144,16 @@ public partial class SuppliesViewWindow : Window
     {
         new SupplierViewWindow().Show();
     }
+
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        new MainMenuWindow().Show();
+        this.Close();
+    }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        new LoginWindow().Show();
+        this.Close();
+    }
 }

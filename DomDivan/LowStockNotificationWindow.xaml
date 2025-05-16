@@ -6,11 +6,39 @@
         xmlns:local="clr-namespace:DomDivan"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Товары с малым запасом" 
-        Height="600" Width="800"
-        WindowStartupLocation="CenterScreen">
+        Title="Товары с малым количеством на складе" 
+        Height="650" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
     <Window.Resources>
-        <!-- Конвертер для подсветки низкого количества -->
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для подсветки низкого количества -->
         <Style x:Key="LowStockStyle" TargetType="TextBlock">
             <Style.Triggers>
                 <Trigger Property="Text" Value="0">
@@ -23,59 +51,97 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Стиль для ListView -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
         </Grid.RowDefinitions>
 
-        <!-- Заголовок -->
-        <TextBlock Grid.Row="0" Text="Товары с количеством менее 5 на складе" 
-                   FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Список товаров -->
-        <ListView Grid.Row="1" x:Name="LowStockListView" SelectionMode="Single">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Expander Margin="0,5">
-                        <Expander.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding ProductTitle}" Width="200" Margin="5" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding VariantTitle}" Width="200" Margin="5"/>
-                                <TextBlock Text="{Binding StockQuantity}" Width="80" Margin="5" 
-                                           Foreground="Red" FontWeight="Bold"/>
-                            </StackPanel>
-                        </Expander.Header>
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Товары с малым количеством на складе" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
 
-                        <StackPanel Margin="10,5">
-                            <TextBlock Text="Последние поставщики:" FontWeight="Bold" Margin="0,0,0,5"/>
+                <!-- Кнопка "Выход" -->
+                <Button x:Name="ExitButton" 
+                        Grid.Column="2"
+                        Content="Выход" 
+                        Style="{StaticResource ModernButton}"
+                        HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
 
-                            <ItemsControl ItemsSource="{Binding SupplierShortLastInfos}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Padding="0,0,0,5" Margin="0,0,0,5">
-                                            <StackPanel>
-                                                <TextBlock>
-                                                    <Run Text="{Binding CompanyName}" FontWeight="Bold"/>
-                                                    <Run Text=" ("/>
-                                                    <Run Text="{Binding ContactPerson}"/>
-                                                    <Run Text=", "/>
-                                                    <Run Text="{Binding PhoneNumber}"/>
-                                                    <Run Text=")"/>
-                                                </TextBlock>
-                                                <TextBlock Text="{Binding LastPrice, StringFormat='Последняя цена: {0:C}'}" 
-                                                           Margin="10,2,0,0"/>
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Expander>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <!-- Основное содержимое -->
+        <Border Grid.Row="1" Background="White" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="10">
+            <Grid>
+                <!-- Список товаров -->
+                <ListView x:Name="LowStockListView" SelectionMode="Single">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Margin="0,5" BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1">
+                                <Expander.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding ProductTitle}" Width="250" Margin="5" FontWeight="Bold" FontSize="14"/>
+                                        <TextBlock Text="{Binding VariantTitle}" Width="250" Margin="5" FontSize="14"/>
+                                        <TextBlock Text="{Binding StockQuantity}" Width="100" Margin="5" 
+                                                   Style="{StaticResource LowStockStyle}" FontSize="14"/>
+                                    </StackPanel>
+                                </Expander.Header>
+
+                                <StackPanel Margin="10,5">
+                                    <TextBlock Text="Последние поставщики:" FontWeight="Bold" Margin="0,0,0,5" FontSize="14"/>
+
+                                    <ItemsControl ItemsSource="{Binding SupplierShortLastInfos}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1" Padding="0,0,0,5" Margin="0,0,0,5">
+                                                    <StackPanel>
+                                                        <TextBlock FontSize="14">
+                                                            <Run Text="{Binding CompanyName}" FontWeight="Bold"/>
+                                                            <Run Text=" ("/>
+                                                            <Run Text="{Binding ContactPerson}"/>
+                                                            <Run Text=", "/>
+                                                            <Run Text="{Binding PhoneNumber}"/>
+                                                            <Run Text=")"/>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding LastPrice, StringFormat='Последняя цена: {0:N2} руб.'}" 
+                                                                   Margin="10,2,0,0" FontSize="13"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

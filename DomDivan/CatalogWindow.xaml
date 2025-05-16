@@ -5,18 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
-        Title="Каталог" 
-        Height="500" 
-        Width="850"
-        MinHeight="490"
-        MinWidth="850"
+        Title="Каталог товаров" 
+        Height="600" 
+        Width="900"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5"
         SizeChanged="Window_SizeChanged">
+
     <Window.Resources>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:DiscountToStrikethroughConverter x:Key="DiscountToStrikethroughConverter"/>
         <local:DiscountToGrayTextConverter x:Key="DiscountToGrayTextConverter"/>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style TargetType="ListBoxItem">
             <Setter Property="Template">
                 <Setter.Value>
@@ -25,235 +55,248 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              Margin="{TemplateBinding Padding}"/>
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Margin="{TemplateBinding Padding}"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Window.Resources>
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
+        </Grid.RowDefinitions>
 
-        <!-- Блок фильтров -->
-        <Border Grid.Column="0"
-                BorderBrush="Gray" 
-                BorderThickness="2" 
-                Margin="5"
-                Padding="10"
-                Background="White"
-                CornerRadius="5">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <!-- Логотип -->
-                    <Image Source="/Image/logo.png" 
-                       Height="40" 
-                       Margin="0,0,0,10"
-                       Stretch="Uniform"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Заголовок фильтров -->
-                    <TextBlock Text="Фильтры" 
-                           FontSize="20" 
-                           Margin="0,0,0,10" 
-                           FontWeight="Bold"/>
-
-
-                    <!-- Сортировка -->
-                    <ComboBox ItemsSource="{Binding SortOptions}"
-                              SelectedItem="{Binding SelectedSortOption}"
-                              Margin="0,0,0,10"
-                              FontSize="14">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                    <!-- Фильтр по типу товара -->
-                    <Expander Header="Категория" 
-                              IsExpanded="True">
-                        <StackPanel>
-                            <CheckBox Content="Диваны" 
-                                      IsChecked="{Binding FilterSofa}"
-                                      Margin="2"/>
-                            <CheckBox Content="Кровати" 
-                                      IsChecked="{Binding FilterBed}"
-                                      Margin="2"/>
-                            <CheckBox Content="Кресла" 
-                                      IsChecked="{Binding FilterArmchair}"
-                                      Margin="2"/>
-                        </StackPanel>
-                    </Expander>
-
-                    <!-- Фильтр по цене -->
-                    <Expander Header="Цена" 
-                              IsExpanded="True" 
-                              Margin="0,10,0,0">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="27"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Label Grid.Column="0"
-                                       Content="От:"
-                                       FontSize="13"/>
-
-                                <Border Grid.Column="1"
-                                        BorderBrush="Gray" 
-                                        BorderThickness="2" 
-                                        Background="White"
-                                        CornerRadius="5"
-                                        Height="25">
-                                    <TextBox Width="70" 
-                                             Height="25" 
-                                             BorderThickness="0"
-                                             Text="{Binding MinPrice, UpdateSourceTrigger=PropertyChanged}"/>
-                                </Border>
-
-                                <Label Grid.Column="2"
-                                       Content="До:"
-                                       FontSize="13"/>
-
-                                <Border Grid.Column="3"
-                                        BorderBrush="Gray" 
-                                        BorderThickness="2" 
-                                        Background="White"
-                                        CornerRadius="5"
-                                        Height="25">
-                                    <TextBox Width="70" 
-                                             Height="25" 
-                                             BorderThickness="0"
-                                             Text="{Binding MaxPrice, UpdateSourceTrigger=PropertyChanged}"/>
-                                </Border>
-                            </Grid>
-
-                            <Slider Grid.Row="1"
-                                    Minimum="{Binding MinViewPrice}"
-                                    Maximum="{Binding MaxViewPrice}"
-                                    Value="{Binding MaxPrice}"
-                                    Margin="0,5,0,0"/>
-                        </Grid>
-                    </Expander>
-
-                    <!-- Фильтр по цвету -->
-                    <Expander Header="Цвет" 
-                              IsExpanded="False" 
-                              Margin="0,10,0,0">
-                        <ItemsControl ItemsSource="{Binding Colors}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding Name}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Margin="2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Expander>
-
-                    <!-- Фильтр по материалу -->
-                    <Expander Header="Материал" 
-                              IsExpanded="False" 
-                              Margin="0,10,0,0">
-                        <ItemsControl ItemsSource="{Binding Cloths}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding Name}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Margin="2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Expander>
-
-                    <!-- Фильтр по наполнителю (не для кроватей) -->
-                    <Expander x:Name="FillingExpander"
-                              Header="Наполнитель" 
-                              IsExpanded="False" 
-                              Margin="0,10,0,0">
-                        <ItemsControl ItemsSource="{Binding Fillings}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding Name}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Margin="2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Expander>
-
-                    <!-- Фильтр по механизму (только для диванов) -->
-                    <Expander x:Name="MechanismExpander" 
-                              Header="Механизм" 
-                              IsExpanded="False" 
-                              Margin="0,10,0,0">
-                        <ItemsControl ItemsSource="{Binding Mechanisms}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding Name}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Margin="2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Expander>
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Каталог товаров" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
                 </StackPanel>
-            </ScrollViewer>
+
+                <!-- Кнопка "Выход" -->
+                <Button x:Name="ExitButton" 
+                        Grid.Column="2"
+                        Content="Выход" 
+                        Style="{StaticResource ModernButton}"
+                        Click="ExitButton_Click"/>
+            </Grid>
         </Border>
 
-        <!-- Поисковая строка, избранное и корзина -->
-        <Grid Grid.Column="1" 
-              Margin="5,0,5,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <!-- Основное содержимое -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Поисковая строка и иконки -->
-            <Border Grid.Row="0"
-                Background="White"
-                BorderBrush="Gray"
-                BorderThickness="1"
-                CornerRadius="5"
-                Padding="5"
-                Margin="0,0,0,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <!-- Блок фильтров -->
+            <Border Grid.Column="0"
+                    BorderBrush="#FFE0E0E0" 
+                    BorderThickness="1" 
+                    Background="White"
+                    CornerRadius="5">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <!-- Заголовок фильтров -->
+                        <TextBlock Text="Фильтры" 
+                               FontSize="18" 
+                               Margin="0,0,0,10" 
+                               FontWeight="Bold"/>
 
-                    <!-- Поисковая строка -->
-                    <TextBox Grid.Column="0"
-                             VerticalAlignment="Center"
-                             BorderThickness="0"
-                             x:Name="searchBox"
-                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                        <!-- Сортировка -->
+                        <ComboBox ItemsSource="{Binding SortOptions}"
+                                  SelectedItem="{Binding SelectedSortOption}"
+                                  Margin="0,0,0,10"
+                                  FontSize="14">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
-                    <!-- Иконка "Корзина" с количеством товаров -->
-                    <Grid Grid.Column="1"
+                        <!-- Фильтр по типу товара -->
+                        <Expander Header="Категория" IsExpanded="True">
+                            <StackPanel>
+                                <CheckBox Content="Диваны" 
+                                          IsChecked="{Binding FilterSofa}"
+                                          Margin="2"/>
+                                <CheckBox Content="Кровати" 
+                                          IsChecked="{Binding FilterBed}"
+                                          Margin="2"/>
+                                <CheckBox Content="Кресла" 
+                                          IsChecked="{Binding FilterArmchair}"
+                                          Margin="2"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Фильтр по цене -->
+                        <Expander Header="Цена" IsExpanded="True" Margin="0,10,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="27"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Column="0" Content="От:" FontSize="13"/>
+                                    <Border Grid.Column="1"
+                                            BorderBrush="#FFE0E0E0" 
+                                            BorderThickness="1" 
+                                            Background="White"
+                                            CornerRadius="3"
+                                            Height="25">
+                                        <TextBox Width="70" 
+                                                 Height="25" 
+                                                 BorderThickness="0"
+                                                 Text="{Binding MinPrice, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Border>
+
+                                    <Label Grid.Column="2" Content="До:" FontSize="13"/>
+                                    <Border Grid.Column="3"
+                                            BorderBrush="#FFE0E0E0" 
+                                            BorderThickness="1" 
+                                            Background="White"
+                                            CornerRadius="3"
+                                            Height="25">
+                                        <TextBox Width="70" 
+                                                 Height="25" 
+                                                 BorderThickness="0"
+                                                 Text="{Binding MaxPrice, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Border>
+                                </Grid>
+
+                                <Slider Grid.Row="1"
+                                        Minimum="{Binding MinViewPrice}"
+                                        Maximum="{Binding MaxViewPrice}"
+                                        Value="{Binding MaxPrice}"
+                                        Margin="0,5,0,0"/>
+                            </Grid>
+                        </Expander>
+
+                        <!-- Остальные фильтры (цвет, материал и т.д.) -->
+                        <Expander Header="Цвет" IsExpanded="False" Margin="0,10,0,0">
+                            <ItemsControl ItemsSource="{Binding Colors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+
+                        <Expander Header="Материал" IsExpanded="False" Margin="0,10,0,0">
+                            <ItemsControl ItemsSource="{Binding Cloths}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+
+                        <Expander x:Name="FillingExpander"
+                                  Header="Наполнитель" 
+                                  IsExpanded="False" 
+                                  Margin="0,10,0,0">
+                            <ItemsControl ItemsSource="{Binding Fillings}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+
+                        <Expander x:Name="MechanismExpander" 
+                                  Header="Механизм" 
+                                  IsExpanded="False" 
+                                  Margin="0,10,0,0">
+                            <ItemsControl ItemsSource="{Binding Mechanisms}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Правая часть с товарами -->
+            <Grid Grid.Column="1" Margin="10,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Поисковая строка и корзина -->
+                <Border Grid.Row="0"
+                        Background="White"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10"
+                        Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 VerticalAlignment="Center"
+                                 BorderThickness="0"
+                                 x:Name="searchBox"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="14"
+                                 Padding="5"/>
+
+                        <!-- Иконка "Корзина" с количеством товаров -->
+                        <Grid Grid.Column="1"
                           VerticalAlignment="Center"
                           Width="35"
                           Height="35"
                           Cursor="Hand"
                           MouseDown="GridIcon_MouseDown">
-                        <Image Source="/Image/cart_icon.png" 
+                            <Image Source="/Image/cart_icon.png" 
                                Width="24"
                                Height="24"/>
-                        <Border Background="Red"
+                            <Border Background="Red"
                                 Width="20"
                                 Height="20"
                                 CornerRadius="10"
@@ -261,141 +304,151 @@
                                 VerticalAlignment="Top"
                                 Margin="0,15,-3,0"
                                 RenderTransformOrigin="0.154,1.136">
-                            <TextBlock x:Name="CartCount"
+                                <TextBlock x:Name="CartCount"
                                        Text="{Binding ItemsCount, Source={x:Static local:CartService.Instance}}"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
                                        Foreground="White"
                                        FontSize="12"
                                        FontWeight="Bold"/>
-                        </Border>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Border>
+                </Border>
 
-            <!-- Список товаров -->
-            <ListBox Grid.Row="1"
-                     x:Name="ListItems"
-                     HorizontalContentAlignment="Stretch"
-                     VerticalAlignment="Top"
-                     SelectionChanged="ViewSelected_Click">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="{Binding ColumnCount}" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
+                <!-- Список товаров -->
+                <ListBox Grid.Row="1"
+                         x:Name="ListItems"
+                         HorizontalContentAlignment="Stretch"
+                         VerticalAlignment="Top"
+                         Background="White"
+                         BorderBrush="#FFE0E0E0"
+                         BorderThickness="1"
+                         SelectionChanged="ViewSelected_Click">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="{Binding ColumnCount}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="10" 
-                                Padding="10" 
-                                BorderBrush="#ddd" 
-                                BorderThickness="1">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="200"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-
-                                <!-- Изображение товара -->
-                                <Image Grid.Row="0" 
-                                       Source="{Binding Photo}" 
-                                       Stretch="Uniform"
-                                       MaxHeight="200"
-                                       MaxWidth="250"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-
-                                <Grid Grid.Row="1">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="10" 
+                                    Padding="10" 
+                                    BorderBrush="#FFE0E0E0" 
+                                    BorderThickness="1"
+                                    Background="White"
+                                    CornerRadius="5">
+                                <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="200"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Text="{Binding FullName}" 
-                                               FontWeight="Bold" 
-                                               HorizontalAlignment="Center"/>
+                                    <!-- Изображение товара -->
+                                    <Image Grid.Row="0" 
+                                           Source="{Binding Photo}" 
+                                           Stretch="Uniform"
+                                           MaxHeight="200"
+                                           MaxWidth="250"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
 
-                                    <!-- Блок цены -->
-                                    <StackPanel Grid.Row="1" 
-                                                HorizontalAlignment="Center"
-                                                Orientation="Horizontal">
-                                        <!-- Блок для случая без скидки -->
-                                        <TextBlock Text="{Binding Price, StringFormat='{} {0:N2} руб.'}"
-                                                   FontWeight="Bold"
-                                                   Visibility="{Binding Discount, 
-                                                                Converter={StaticResource NullToVisibilityConverter}, 
-                                                                ConverterParameter=invert}"/>
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                        <!-- Блок для случая со скидкой -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    Visibility="{Binding Discount, 
-                                                                 Converter={StaticResource NullToVisibilityConverter}}">
-                                            <!-- Цена без скидки (перечеркнутая) -->
-                                            <TextBlock Text="{Binding Price, StringFormat='{} {0:N2}'}"
-                                                       TextDecorations="{Binding Discount, 
-                                                                         Converter={StaticResource DiscountToStrikethroughConverter}}"
-                                                       Foreground="{Binding Discount, 
-                                                                    Converter={StaticResource DiscountToGrayTextConverter}}"
-                                                       Margin="0,0,5,0"/>
+                                        <TextBlock Text="{Binding FullName}" 
+                                                   FontWeight="Bold" 
+                                                   HorizontalAlignment="Center"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,5"/>
 
-                                            <!-- Скидка -->
-                                            <TextBlock Text="{Binding Discount, 
-                                                              StringFormat='{} {0}%'}"
-                                                       Foreground="Red"
-                                                       FontWeight="Bold"/>
-
-                                            <!-- Цена со скидкой -->
-                                            <TextBlock Text="{Binding DiscountPrice, 
-                                                              StringFormat='{} {0:N2} руб.'}"
-                                                       FontWeight="Bold"
-                                                       Margin="5,0,0,0"/>
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <TextBlock Grid.Row="2"
-                                               Text="{Binding Description}"
-                                               HorizontalAlignment="Center"/>
-
-                                    <!-- Блок кнопок корзины -->
-                                    <Grid Grid.Row="3">
-                                        <!-- Кнопка "Добавить в корзину" (видна, если товара нет в корзине) -->
-                                        <Button x:Name="AddToCartButton"
-                                                Content="Добавить в корзину"
-                                                HorizontalAlignment="Center"
-                                                Margin="5"
-                                                Click="AddToCart_Click"
-                                                Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-
-                                        <!-- Счетчик товаров (виден, если товар в корзине) -->
-                                        <StackPanel Orientation="Horizontal"
+                                        <!-- Блок цены -->
+                                        <StackPanel Grid.Row="1" 
                                                     HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Visibility="{Binding IsInCart, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Button Content="-"
-                                                    Width="30"
-                                                    Click="DecreaseQuantity_Click"
-                                                    Tag="{Binding Id}"/>
+                                                    Orientation="Horizontal"
+                                                    Margin="0,5">
+                                            <!-- Без скидки -->
+                                            <TextBlock Text="{Binding Price, StringFormat='{} {0:N2} руб.'}"
+                                                       FontWeight="Bold"
+                                                       Visibility="{Binding Discount, 
+                                                                    Converter={StaticResource NullToVisibilityConverter}, 
+                                                                    ConverterParameter=invert}"/>
 
-                                            <TextBlock Text="{Binding CartQuantity}"
-                                                       Width="40"
-                                                       TextAlignment="Center"
-                                                       VerticalAlignment="Center"/>
+                                            <!-- Со скидкой -->
+                                            <StackPanel Orientation="Horizontal"
+                                                        Visibility="{Binding Discount, 
+                                                                     Converter={StaticResource NullToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding Price, StringFormat='{} {0:N2}'}"
+                                                           TextDecorations="{Binding Discount, 
+                                                                             Converter={StaticResource DiscountToStrikethroughConverter}}"
+                                                           Foreground="{Binding Discount, 
+                                                                        Converter={StaticResource DiscountToGrayTextConverter}}"
+                                                           Margin="0,0,5,0"/>
 
-                                            <Button Content="+"
-                                                    Width="30"
-                                                    Click="IncreaseQuantity_Click"
-                                                    Tag="{Binding Id}"/>
+                                                <TextBlock Text="{Binding Discount, 
+                                                                  StringFormat='{} {0}%'}"
+                                                           Foreground="Red"
+                                                           FontWeight="Bold"/>
+
+                                                <TextBlock Text="{Binding DiscountPrice, 
+                                                                  StringFormat='{} {0:N2} руб.'}"
+                                                           FontWeight="Bold"
+                                                           Margin="5,0,0,0"/>
+                                            </StackPanel>
                                         </StackPanel>
+
+                                        <TextBlock Grid.Row="2"
+                                                   Text="{Binding Description}"
+                                                   HorizontalAlignment="Center"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,5"/>
+
+                                        <!-- Кнопки корзины -->
+                                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                                            <!-- Добавить в корзину -->
+                                            <Button x:Name="AddToCartButton"
+                                                    Content="Добавить в корзину"
+                                                    Style="{StaticResource ModernButton}"
+                                                    HorizontalAlignment="Center"
+                                                    Click="AddToCart_Click"
+                                                    Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                                            <!-- Управление количеством -->
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{Binding IsInCart, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <Button Content="-"
+                                                        Style="{StaticResource ModernButton}"
+                                                        Width="30"
+                                                        Click="DecreaseQuantity_Click"
+                                                        Tag="{Binding Id}"/>
+
+                                                <TextBlock Text="{Binding CartQuantity}"
+                                                           Width="40"
+                                                           TextAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+
+                                                <Button Content="+"
+                                                        Style="{StaticResource ModernButton}"
+                                                        Width="30"
+                                                        Click="IncreaseQuantity_Click"
+                                                        Tag="{Binding Id}"/>
+                                            </StackPanel>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

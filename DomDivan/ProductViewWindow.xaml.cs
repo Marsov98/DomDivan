@@ -327,6 +327,12 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         this.Close();
     }
 
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        new LoginWindow().Show();
+        this.Close();
+    }
+
     private void AddToCart_Click(object sender, RoutedEventArgs e)
     {
         if (CurrentVariant != null)

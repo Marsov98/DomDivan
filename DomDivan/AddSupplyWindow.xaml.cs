@@ -23,7 +23,7 @@ public partial class AddSupplyWindow : Window
         InitializeComponent();
         _context = new DomDivanContext();
         LoadData();
-        ProductsDataGrid.ItemsSource = _productsInSupplyView;
+        ProductsListView.ItemsSource = _productsInSupplyView;
     }
 
     private void LoadData()
@@ -112,7 +112,7 @@ public partial class AddSupplyWindow : Window
         if (existingItem != null)
         {
             existingItem.Quantity += quantity;
-            ProductsDataGrid.Items.Refresh();
+            ProductsListView.Items.Refresh();
         }
         else
         {

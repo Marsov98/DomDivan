@@ -18,39 +18,10 @@ public partial class LoginWindow : Window
     {
         // Логика обработки нажатия кнопки "Войти"
         string username = UsernameTextBox.Text;
-        string password = PasswordBox.Text;
+        string password = PasswordBox.Password.ToString();
 
-
-        using (var context = new DomDivanContext())
-        {
-            new MainMenuWindow().Show();
-            this.Close();
-
-            /*Product product = context.Products
-                .Include(p => p.Category)
-                .Include(p => p.Variants)
-                    .ThenInclude(v => v.Color)
-                .Include(p => p.Variants)
-                    .ThenInclude(v => v.Cloth)
-                .Include(p => p.Variants)
-                    .ThenInclude(v => v.SofaType)
-                .Include(p => p.Variants)
-                    .ThenInclude(v => v.Photos)
-                .FirstOrDefault();
-
-            var editor = new ProductEditorWindow(product);
-            if (editor.ShowDialog() == true)
-            {
-                MessageBox.Show("Товар успешно сохранен");
-            }*/
-            //new ProductEditorWindow().Show();
-            //this.Close();
-        }
-
-        /*else
-        {
-            MessageBox.Show("Неверный логин или пароль.");
-        }*/
+        new MainMenuWindow().Show();
+        this.Close();
     }
 
     private void GuestButton_Click(object sender, RoutedEventArgs e)

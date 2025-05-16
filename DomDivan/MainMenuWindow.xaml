@@ -6,33 +6,139 @@
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
         Title="Управление складом" 
-        Height="400" Width="600"
-        WindowStartupLocation="CenterScreen">
+        Height="500" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5"
+        ResizeMode="NoResize">
+    
+    <!-- Стиль для кнопок (вынесен в ресурсы) -->
+    <Window.Resources>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <!-- Тёмный цвет -->
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            Padding="10,5">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                    <!-- Эффект при наведении -->
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="*"/>
+            <!-- Основное содержимое -->
         </Grid.RowDefinitions>
 
-        <!-- Заголовок -->
-        <TextBlock Grid.Row="0" Text="Управление складом" 
-                   FontSize="24" FontWeight="Bold"
-                   HorizontalAlignment="Center" Margin="0,20"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A"
+                Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Кнопки навигации -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button x:Name="SuppliesButton" Content="Поставки" Margin="10,0,10,0"
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Управление складом" 
+                               FontSize="20" 
+                               FontWeight="Bold"
+                               Foreground="White"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопка "Выход" -->
+                <Button x:Name="ExitButton" 
+                        Grid.Column="2"
+                        Content="Выход" 
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        Foreground="White"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Click="ExitButton_Click"
+                        Cursor="Hand"
+                        Padding="10,5">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="4">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FF333333"/>
+                                    <!-- Эффект при наведении -->
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Основное содержимое -->
+        <StackPanel Grid.Row="1" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+
+            <!-- Кнопки навигации -->
+            <Button x:Name="SuppliesButton" 
+                    Content="Поставки" 
+                    Margin="15" 
+                    Width="150" 
+                    Height="50"
+                    FontSize="16"
                     Click="SuppliesButton_Click"
-                    FontSize="15"/>
+                    Style="{StaticResource ModernButtonStyle}"/>
 
-            <Button x:Name="OrdersButton" Content="Заказы" Margin="10,0,10,0"
+            <Button x:Name="OrdersButton" 
+                    Content="Заказы" 
+                    Margin="15" 
+                    Width="150" 
+                    Height="50"
+                    FontSize="16"
                     Click="OrdersButton_Click"
-                    FontSize="15"/>
+                    Style="{StaticResource ModernButtonStyle}"/>
 
-            <Button x:Name="ProductsButton" Content="Товары" Margin="10,0,10,0"
+            <Button x:Name="ProductsButton" 
+                    Content="Товары" 
+                    Margin="15" 
+                    Width="150" 
+                    Height="50"
+                    FontSize="16"
                     Click="ProductsButton_Click"
-                    FontSize="15"/>
+                    Style="{StaticResource ModernButtonStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -8,7 +8,9 @@
         mc:Ignorable="d"
         Title="Администрирование товаров" 
         Height="800" Width="1200"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5F5F5">
+
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
@@ -44,29 +46,112 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0 0 0 10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- Стиль для ListView -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Администрирование товаров" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Кнопки навигации -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Назад" 
+                            Style="{StaticResource ModernButton}"
+                            Margin="0,0,10,0"
+                            Click="BackButton_Click"/>
+                    <Button Content="Выход" 
+                            Style="{StaticResource ModernButton}"
+                            Click="ExitButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Панель управления -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Добавить товар" Click="AddProduct_Click" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="Управление параметрами" Click="ManageParameters_Click" Margin="0,0,10,0" Padding="10,5"/>
-            <Button Content="Выход" HorizontalAlignment="Right" Click="ExitButton_Click"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+            <Button Content="Добавить товар" 
+                    Style="{StaticResource ModernButton}"
+                    Click="AddProduct_Click" 
+                    Margin="0,0,10,0"/>
+            <Button Content="Управление параметрами" 
+                    Style="{StaticResource ModernButton}"
+                    Click="ManageParameters_Click" 
+                    Margin="0,0,10,0"/>
+
             <!-- Иконка "Уведомления" с количеством товаров -->
-            <Grid Grid.Column="1"
-                  VerticalAlignment="Center"
+            <Grid VerticalAlignment="Center"
                   Width="35"
                   Height="35"
                   Cursor="Hand"
                   MouseDown="GridIcon_MouseDown">
-                <Image Source="/Image/cart_icon.png" 
+                <Image Source="/black_notification_icon.png" 
                        Width="24"
                        Height="24"/>
                 <Border Background="Red"
@@ -74,9 +159,7 @@
                         Height="20"
                         CornerRadius="10"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Margin="0,15,-3,0"
-                        RenderTransformOrigin="0.154,1.136">
+                        VerticalAlignment="Top">
                     <TextBlock x:Name="LowQuantityCount"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -85,18 +168,29 @@
                                FontWeight="Bold"/>
                 </Border>
             </Grid>
+
         </StackPanel>
 
         <!-- Фильтры и сортировка -->
-        <GroupBox Grid.Row="1" Header="Фильтры и сортировка" Margin="0,0,0,10">
+        <GroupBox Grid.Row="2" Header="Фильтры и сортировка">
             <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="FilterComboBox" SelectionChanged="FilterComboBox_SelectionChanged"  Width="150" Margin="5" SelectedIndex="0">
+                <ComboBox x:Name="FilterComboBox" 
+                          SelectionChanged="FilterComboBox_SelectionChanged"  
+                          Width="150" 
+                          Margin="5" 
+                          SelectedIndex="0"
+                          FontSize="14">
                     <ComboBoxItem Content="Все товары"/>
                     <ComboBoxItem Content="Со скидкой"/>
                     <ComboBoxItem Content="Мало на складе (&lt;5)"/>
                 </ComboBox>
 
-                <ComboBox x:Name="SortComboBox" Width="150" Margin="5" SelectionChanged="SortComboBox_SelectionChanged" SelectedIndex="0">
+                <ComboBox x:Name="SortComboBox" 
+                          Width="150" 
+                          Margin="5" 
+                          SelectionChanged="SortComboBox_SelectionChanged" 
+                          SelectedIndex="0"
+                          FontSize="14">
                     <ComboBoxItem Content="По названию (А-Я)"/>
                     <ComboBoxItem Content="По названию (Я-А)"/>
                     <ComboBoxItem Content="По цене (↑)"/>
@@ -105,28 +199,36 @@
                     <ComboBoxItem Content="По скидке (↓)"/>
                 </ComboBox>
 
-                <TextBox x:Name="SearchTextBox" Width="200" Margin="5" 
+                <TextBox x:Name="SearchTextBox" 
+                         Width="200" 
+                         Margin="5" 
                          TextChanged="SearchTextBox_TextChanged"
-                         ToolTip="Поиск по названию..."/>
+                         FontSize="14"
+                         ToolTip="Поиск по названию..."
+                         BorderBrush="#FFE0E0E0"/>
             </StackPanel>
         </GroupBox>
 
         <!-- Список товаров -->
-        <ListView Grid.Row="2" x:Name="ProductsListView" SelectionMode="Single" 
-                  MouseDoubleClick="ProductsListView_MouseDoubleClick">
+        <ListView Grid.Row="3" 
+                  x:Name="ProductsListView" 
+                  SelectionMode="Single" 
+                  MouseDoubleClick="ProductsListView_MouseDoubleClick"
+                  Margin="0,10,0,10">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Expander>
+                    <Expander BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding FullName}" Width="Auto" Margin="5"/>
+                                <TextBlock Text="{Binding FullName}" Width="250" Margin="5" FontSize="14"/>
                                 <!-- Блок цены -->
-                                <StackPanel Grid.Row="1" 
-                                            HorizontalAlignment="Center"
-                                            Orientation="Horizontal" Margin="5">
+                                <StackPanel HorizontalAlignment="Center"
+                                            Orientation="Horizontal" 
+                                            Margin="5">
                                     <!-- Блок для случая без скидки -->
                                     <TextBlock Text="{Binding Price, StringFormat='{} {0:N2} руб.'}"
                                                FontWeight="Bold"
+                                               FontSize="14"
                                                Visibility="{Binding Discount, 
                                                             Converter={StaticResource NullToVisibilityConverter}, 
                                                             ConverterParameter=invert}"/>
@@ -136,6 +238,7 @@
                                                 Visibility="{Binding Discount, Converter={StaticResource NullToVisibilityConverter}}">
                                         <!-- Цена без скидки (перечеркнутая) -->
                                         <TextBlock Text="{Binding Price, StringFormat='{} {0:N2}'}"
+                                                   FontSize="14"
                                                    TextDecorations="{Binding Discount, 
                                                                      Converter={StaticResource DiscountToStrikethroughConverter}}"
                                                    Foreground="{Binding Discount, 
@@ -146,28 +249,30 @@
                                         <TextBlock Text="{Binding Discount, 
                                                           StringFormat='{} {0}%'}"
                                                    Foreground="Red"
-                                                   FontWeight="Bold"/>
+                                                   FontWeight="Bold"
+                                                   FontSize="14"/>
 
                                         <!-- Цена со скидкой -->
                                         <TextBlock Text="{Binding DiscountPrice, 
                                                           StringFormat='{} {0:N2} руб.'}"
                                                    FontWeight="Bold"
+                                                   FontSize="14"
                                                    Margin="5,0,0,0"/>
                                     </StackPanel>
                                 </StackPanel>
-                                <TextBlock Text="{Binding Description}" Width="Auto" Margin="5"/>
+                                <TextBlock Text="{Binding Description}" Width="300" Margin="5" FontSize="14" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Expander.Header>
 
-                        <ItemsControl ItemsSource="{Binding Variants}">
+                        <ItemsControl ItemsSource="{Binding Variants}" Margin="10,5,0,5">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Margin="10,5,0,5">
-                                        <TextBlock Text="{Binding Color.Name}" Width="120" Margin="5"/>
-                                        <TextBlock Text="{Binding Cloth.Name}" Width="150" Margin="5"/>
-                                        <TextBlock Text="{Binding SofaType.Name}" Width="150" Margin="5"
+                                        <TextBlock Text="{Binding Color.Name}" Width="120" Margin="5" FontSize="14"/>
+                                        <TextBlock Text="{Binding Cloth.Name}" Width="150" Margin="5" FontSize="14"/>
+                                        <TextBlock Text="{Binding SofaType.Name}" Width="150" Margin="5" FontSize="14"
                                                    Visibility="{Binding DataContext.IsSofa, RelativeSource={RelativeSource AncestorType=Expander}, Converter={StaticResource BoolToVisibility}}"/>
-                                        <TextBlock Text="{Binding StockQuantity}" Width="80" Margin="5"
+                                        <TextBlock Text="{Binding StockQuantity}" Width="80" Margin="5" FontSize="14"
                                                    Style="{StaticResource LowStockStyle}"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -179,9 +284,9 @@
         </ListView>
 
         <!-- Статус бар -->
-        <StatusBar Grid.Row="3">
+        <StatusBar Grid.Row="4" Background="White" BorderBrush="#FFE0E0E0">
             <StatusBarItem>
-                <TextBlock x:Name="StatusTextBlock"/>
+                <TextBlock x:Name="StatusTextBlock" FontSize="14"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

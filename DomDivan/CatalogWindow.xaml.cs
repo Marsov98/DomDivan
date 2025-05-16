@@ -491,12 +491,17 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         this.Close();
     }
 
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        new LoginWindow().Show();
+        this.Close();
+    }
+
     #endregion
 
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
 }
 
 #region Helper Classes

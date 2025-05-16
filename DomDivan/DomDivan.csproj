@@ -9,9 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="black_notification_icon.png" />
+    <None Remove="Image\black_notification_icon.png" />
     <None Remove="Image\cart_icon.png" />
     <None Remove="Image\logo.png" />
+    <None Remove="Image\notification_icon.png" />
     <None Remove="Image\picture.png" />
+    <None Remove="notification_icon.png" />
+    <None Remove="white_notification_icon.png" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -36,6 +41,10 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <Resource Include="black_notification_icon.png" />
+    <Resource Include="Image\black_notification_icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Image\cart_icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -45,6 +54,8 @@
     <Resource Include="Image\picture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="notification_icon.png" />
+    <Resource Include="white_notification_icon.png" />
   </ItemGroup>
 
   <ItemGroup>

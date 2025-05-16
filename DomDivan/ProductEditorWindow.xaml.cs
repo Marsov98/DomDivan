@@ -17,8 +17,6 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private const string IMAGE_FOLDER = "Images";
-
     public string WindowTitle => _isEditMode ? "Редактирование товара" : "Добавление товара";
     public string UniqueGroupName => Guid.NewGuid().ToString();
 
@@ -34,7 +32,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     public ObservableCollection<Filler> Fillers { get; private set; }
     public ObservableCollection<FoldingMechanism> FoldingMechanisms { get; private set; }
 
-    public bool IsSofaCategory => _originalProduct?.Category.Name == "Диван";
+    public bool IsSofaCategory => CurrentProduct?.Category?.Name == "Диван" ? true : false;
 
     public string FormattedDiscountPrice
     {
@@ -268,8 +266,10 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
         if (CategoryComboBox.SelectedItem is Category selectedCategory)
         {
             CurrentProduct.CategoryId = selectedCategory.Id;
+            CurrentProduct.Category = selectedCategory;
             OnPropertyChanged(nameof(IsSofaCategory));
             UpdateCategorySpecificFields();
+            VariantsItemsControl.Items.Refresh();
         }
     }
 
@@ -280,7 +280,14 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
     private void DiscountPrice_TextChanged(object sender, TextChangedEventArgs e)
     {
-        UpdateDiscountPriceDisplay();
+        if (sender is TextBox textBox)
+        {
+            if (string.IsNullOrEmpty(textBox.Text))
+            {
+                CurrentProduct.Discount = null;
+            }
+            UpdateDiscountPriceDisplay();
+        }
     }
 
     private void CategoryField_TextChanged(object sender, TextChangedEventArgs e)
@@ -657,5 +664,21 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        new LoginWindow().Show();
+        this.Close();
+    }
+
+    private void ManageParameters_Click(object sender, RoutedEventArgs e)
+    {
+        //Открытие диалогового окна с параметрами
+    }
+
+    private void DeleteProduct_Click(object sender, RoutedEventArgs e)
+    {
+        //Удаление товара полностью
     }
 }

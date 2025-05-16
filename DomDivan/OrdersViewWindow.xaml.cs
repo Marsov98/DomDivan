@@ -177,4 +177,14 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
             new OrdersDetailsViewWindow(selectedItem).ShowDialog();
         }
     }
+
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
 }

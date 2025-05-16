@@ -6,75 +6,133 @@
         xmlns:local="clr-namespace:DomDivan"
         mc:Ignorable="d"
         Title="Авторизация" 
-        Height="420" 
+        Height="450" 
         Width="400"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Background="#FFF5F5F5">
+
+    <Window.Resources>
+        <!-- Стиль для кнопок -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF1A1A1A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF333333"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для текстового поля "Логин" -->
+        <Style x:Key="ModernLoginTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Стиль для текстового поля "Пароль" -->
+        <Style x:Key="ModernPasswordTextBox" TargetType="PasswordBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="80"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Форма авторизации -->
         </Grid.RowDefinitions>
 
-        <!-- Логотип -->
-        <Image Grid.Row="0"
-               Source="/Image/logo.png" 
-               Width="100"
-               Height="100"
-               HorizontalAlignment="Center"
-               Margin="0,20,0,20"/>
+        <!-- Шапка (Header) -->
+        <Border Grid.Row="0" Background="#FF1A1A1A" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Поле для логина -->
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
+                <!-- Логотип и название -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="/Image/logo.png" Width="40" Height="40" Margin="0,0,10,0"/>
+                    <TextBlock Text="Авторизация" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Форма авторизации -->
+        <StackPanel Grid.Row="1" 
+                    VerticalAlignment="Center" 
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Margin="0,10,0,10">
-            <TextBlock Text="Логин:"
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0"
-                       FontSize="14"/>
-            <TextBox x:Name="UsernameTextBox"
-                     Width="200"
-                     Height="30"
-                     VerticalAlignment="Center"/>
+                    Width="300">
+
+            <!-- Поле для логина -->
+            <StackPanel Margin="0,0,0,15">
+                <TextBlock Text="Логин" 
+                           Margin="0,0,0,5"
+                           FontSize="14"/>
+                <TextBox x:Name="UsernameTextBox"
+                         Style="{StaticResource ModernLoginTextBox}"/>
+            </StackPanel>
+
+            <!-- Поле для пароля -->
+            <StackPanel Margin="0,0,0,25">
+                <TextBlock Text="Пароль" 
+                           Margin="0,0,0,5"
+                           FontSize="14"/>
+                <PasswordBox x:Name="PasswordBox"
+                             Style="{StaticResource ModernPasswordTextBox}"/>
+            </StackPanel>
+
+            <!-- Кнопка "Войти" -->
+            <Button Content="Войти"
+                    Style="{StaticResource ModernButton}"
+                    Width="120"
+                    Height="40"
+                    FontSize="16"
+                    Margin="0,0,0,15"
+                    Click="LoginButton_Click"/>
+
+            <!-- Кнопка "Гость" -->
+            <Button Content="Войти как гость"
+                    Style="{StaticResource ModernButton}"
+                    Width="150"
+                    Height="35"
+                    Background="Transparent"
+                    Foreground="#FF1A1A1A"
+                    BorderBrush="#FF1A1A1A"
+                    BorderThickness="1"
+                    Click="GuestButton_Click"/>
         </StackPanel>
-
-        <!-- Поле для пароля -->
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Margin="0,10,0,10">
-            <TextBlock Text="Пароль:"
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0"
-                       FontSize="14"/>
-            <TextBox x:Name="PasswordBox"
-                     Width="200"
-                     Height="30"
-                     VerticalAlignment="Center"/>
-        </StackPanel>
-
-        <!-- Кнопка "Войти" -->
-        <Button Grid.Row="3"
-                Content="Войти"
-                Width="100"
-                Height="30"
-                HorizontalAlignment="Center"
-                Margin="0,20,0,20"
-                Click="LoginButton_Click"/>
-
-        <!-- Кнопка "Гость" -->
-        <Button Grid.Row="4"
-        Content="Гость"
-        Width="100"
-        Height="30"
-        HorizontalAlignment="Center"
-        Margin="0,20,0,20"
-        Click="GuestButton_Click"/>
     </Grid>
 </Window>

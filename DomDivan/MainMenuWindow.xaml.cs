@@ -32,4 +32,10 @@ public partial class MainMenuWindow : Window
         productsWindow.Show();
         this.Close();
     }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        new LoginWindow().Show();
+        this.Close();
+    }
 }
