@@ -1,6 +1,7 @@
 ﻿using DomDivan.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ public partial class AdminProductsWindow : Window, INotifyPropertyChanged
 
         ApplyFiltersAndSort();
         StatusTextBlock.Text = $"Загружено товаров: {_allProducts.Count}";
-        LowQuantityCount.Text = $"{_allProducts.SelectMany(p => p.Variants).Count(v => v.StockQuantity < 5)}";
+        LowQuantityCount.Text = $"{_allProducts.Sum(p => p.NotificationCount)}";
     }
 
     private async Task<List<ProductViewAdmin>> LoadProductsAsync()
@@ -133,8 +134,7 @@ public partial class AdminProductsWindow : Window, INotifyPropertyChanged
 
     private void ManageParameters_Click(object sender, RoutedEventArgs e)
     {
-        new ParametersWindow().Show();
-        this.Close();
+        new ParametersWindow().ShowDialog();
     }
 
     private async void ProductsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -151,6 +151,27 @@ public partial class AdminProductsWindow : Window, INotifyPropertyChanged
                 .Include(p => p.Variants)
                     .ThenInclude(v => v.Photos)
                 .FirstOrDefault(p => p.Id == selectedProduct.ProductId);
+
+            string imageDirPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                "..", "..", "..", "Image");
+            imageDirPath = Path.GetFullPath(imageDirPath);
+
+            foreach (var variant in product.Variants)
+            {
+                variant.LastBuyPrice = _context.ProductsInSupply
+                                                .AsNoTracking()
+                                                .Include(p => p.Supply)
+                                                .OrderByDescending(p => p.Supply.SupplyDate)
+                                                .Where(v => v.VariantId == variant.Id)
+                                                .Select(p => (decimal?)p.Price)
+                                                .FirstOrDefault();
+
+                foreach (var photo in variant.Photos)
+                {
+                    photo.PhotoPath = $"{imageDirPath}\\{photo.PhotoName}";
+                }
+            }
+
             var editorWindow = new ProductEditorWindow(product);
             if (editorWindow.ShowDialog() == true)
             {

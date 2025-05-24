@@ -13,6 +13,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
 
         <!-- Стиль для кнопок -->
         <Style x:Key="ModernButton" TargetType="Button">
@@ -120,7 +121,7 @@
                             Style="{StaticResource ModernButton}"
                             Margin="0,0,10,0"
                             Click="ManageParameters_Click"/>
-                    <Button Content="Выход" 
+                    <Button Content="Назад" 
                             Style="{StaticResource ModernButton}"
                             Click="ExitButton_Click"/>
                 </StackPanel>
@@ -208,8 +209,10 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
+                                    <!-- Строка 0: Цвет и ткань -->
                                     <Label Grid.Row="0" Grid.Column="0" Content="Цвет:" VerticalAlignment="Center"/>
                                     <ComboBox Grid.Row="0" Grid.Column="1" 
                                               ItemsSource="{Binding DataContext.Colors, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -224,6 +227,7 @@
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding ClothId}"/>
 
+                                    <!-- Строка 1: Тип дивана -->
                                     <Label Grid.Row="1" Grid.Column="0" Content="Тип дивана:" 
                                            Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}"
                                            VerticalAlignment="Center"/>
@@ -234,45 +238,67 @@
                                               SelectedValue="{Binding SofaTypeId}"
                                               Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                    <Label Grid.Row="1" Grid.Column="2" Content="Количество на складе:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="1" Grid.Column="3" 
-                                             Text="{Binding StockQuantity, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <!-- Строка 2: Последняя цена закупки и количество -->
+                                    <Label Grid.Row="2" Grid.Column="0" Content="Количество на складе:" VerticalAlignment="Center"
+                                           Visibility="{Binding DataContext.IsEditMode,
+                                                        RelativeSource={RelativeSource AncestorType=Window},
+                                                        Converter={StaticResource BoolToVisibility}}"/>
+                                    <Label Grid.Row="2" Grid.Column="1" 
+                                           Content="{Binding StockQuantity, StringFormat='{}{0} шт.'}"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding DataContext.IsEditMode,
+                                                        RelativeSource={RelativeSource AncestorType=Window},
+                                                        Converter={StaticResource BoolToVisibility}}"/>
 
-                                    <Label Grid.Row="2" Grid.Column="0" Content="Фотографии:"/>
-                                    <ItemsControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding Photos}" x:Name="PhotosItemsControl">
+                                    <Label Grid.Row="2" Grid.Column="2" Content="Последняя цена закупки:" 
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding LastBuyPrice, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                    <Label Grid.Row="2" Grid.Column="3" 
+                                           Content="{Binding LastBuyPrice, StringFormat='{}{0:N2} руб.'}"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding LastBuyPrice, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                                    <!-- Строка 3: Фотографии -->
+                                    <Label Grid.Row="3" Grid.Column="0" Content="Фотографии:"/>
+                                    <ItemsControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding Photos}" x:Name="PhotosItemsControl">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                                    <Image Source="{Binding PhotoName}" Width="50" Height="50" Margin="0,0,5,0"/>
+                                                    <Image Width="50" Height="50" Margin="0,0,5,0">
+                                                        <Image.Source>
+                                                            <BitmapImage UriSource="{Binding PhotoPath}" CacheOption="OnLoad"/>
+                                                        </Image.Source>
+                                                    </Image>
                                                     <TextBox Text="{Binding PhotoName}" Width="200" Margin="0,0,5,0"/>
                                                     <CheckBox Content="Основная" IsChecked="{Binding IsPrimary}" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                                     <Button Content="Удалить" 
-                                                            Style="{StaticResource DangerButton}"
-                                                            Click="RemovePhoto_Click" 
-                                                            Tag="{Binding}" 
-                                                            CommandParameter="{Binding}" 
-                                                            Padding="5,0"
-                                                            Width="80"/>
+                                                    Style="{StaticResource DangerButton}"
+                                                    Click="RemovePhoto_Click" 
+                                                    Tag="{Binding}" 
+                                                    CommandParameter="{Binding}" 
+                                                    Padding="5,0"
+                                                    Width="80"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
 
-                                    <Button Grid.Row="3" 
-                                            Grid.Column="0" 
-                                            Content="Добавить фото" 
-                                            Style="{StaticResource ModernButton}"
-                                            Click="AddPhoto_Click" 
-                                            Tag="{Binding}"
-                                            Margin="0,5,0,0"/>
-                                    <Button Grid.Row="3" 
-                                            Grid.Column="3" 
-                                            Content="Удалить вариацию" 
-                                            Style="{StaticResource DangerButton}"
-                                            Click="RemoveVariant_Click" 
-                                            Tag="{Binding}" 
-                                            HorizontalAlignment="Right" 
-                                            Margin="0,5,0,0"/>
+                                    <!-- Строка 4: Кнопки -->
+                                    <Button Grid.Row="4" 
+                                    Grid.Column="0" 
+                                    Content="Добавить фото" 
+                                    Style="{StaticResource ModernButton}"
+                                    Click="AddPhoto_Click" 
+                                    Tag="{Binding}"
+                                    Margin="0,5,0,0"/>
+                                    <Button Grid.Row="4" 
+                                    Grid.Column="3" 
+                                    Content="Удалить вариацию" 
+                                    Style="{StaticResource DangerButton}"
+                                    Click="RemoveVariant_Click" 
+                                    Tag="{Binding}" 
+                                    HorizontalAlignment="Right" 
+                                    Margin="0,5,0,0"/>
                                 </Grid>
                             </GroupBox>
                         </DataTemplate>
@@ -287,7 +313,7 @@
                     Style="{StaticResource DangerButton}"
                     Click="DeleteProduct_Click"
                     Margin="0,0,10,0"
-                    Visibility="{Binding IsNewProduct, Converter={StaticResource BoolToVisibility}, ConverterParameter=invert}"/>
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibility}}"/>
             <Button Content="Добавить вариацию" 
                     Style="{StaticResource ModernButton}"
                     Click="AddVariant_Click" 

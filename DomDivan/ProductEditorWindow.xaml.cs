@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,11 +14,11 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 {
     private readonly DomDivanContext _context;
     private Product _originalProduct;
-    private bool _isEditMode;
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public string WindowTitle => _isEditMode ? "Редактирование товара" : "Добавление товара";
+    public bool IsEditMode { get; private set; }
+    public string WindowTitle => IsEditMode ? "Редактирование товара" : "Добавление товара";
     public string UniqueGroupName => Guid.NewGuid().ToString();
 
     public Product CurrentProduct { get; private set; }
@@ -51,7 +52,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
         InitializeComponent();
         _context = new DomDivanContext();
         _originalProduct = product;
-        _isEditMode = product != null;
+        IsEditMode = product != null;
 
         LoadData();
         InitializeProduct();
@@ -71,7 +72,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
     private void InitializeProduct()
     {
-        if (_isEditMode)
+        if (IsEditMode)
         {
             // Клонируем продукт для редактирования
             CurrentProduct = new Product
@@ -90,10 +91,12 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
                     ClothId = v.ClothId,
                     SofaTypeId = v.SofaTypeId,
                     StockQuantity = v.StockQuantity,
+                    LastBuyPrice = v.LastBuyPrice,
                     Photos = v.Photos.Select(p => new PhotoProduct
                     {
                         Id = p.Id,
                         PhotoName = p.PhotoName,
+                        PhotoPath = p.PhotoPath,
                         IsPrimary = p.IsPrimary
                     }).ToList()
                 }).ToList()
@@ -378,23 +381,21 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
             if (openFileDialog.ShowDialog() == true)
             {
-                foreach (var fileName in openFileDialog.FileNames)
+                foreach (var filePath in openFileDialog.FileNames)
                 {
+                    // Получаем только имя файла с расширением
+                    var fileName = Path.GetFileName(filePath);
+
                     // Создаем новую фотографию
                     var newPhoto = new PhotoProduct
                     {
                         PhotoName = fileName,
+                        PhotoPath = filePath, // Сохраняем полный путь для последующего копирования
                         IsPrimary = variant.Photos.Count == 0 // Первая фото становится основной
                     };
 
                     // Добавляем в коллекцию
                     variant.Photos.Add(newPhoto);
-
-                    // Если это первая фотография, делаем ее основной
-                    if (variant.Photos.Count == 1)
-                    {
-                        newPhoto.IsPrimary = true;
-                    }
                 }
 
                 // Обновляем привязку данных
@@ -442,7 +443,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
             using (var transaction = _context.Database.BeginTransaction())
             {
                 // 1. Сохраняем основной продукт
-                if (_isEditMode)
+                if (IsEditMode)
                 {
                     _context.Entry(_originalProduct).CurrentValues.SetValues(CurrentProduct);
                     _context.Entry(_originalProduct).State = EntityState.Modified;
@@ -508,6 +509,10 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
                 _context.Variants.RemoveRange(variantsToRemove);
                 _context.SaveChanges();  // Важно сохранить перед добавлением новых
 
+                string imageDirPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                "..", "..", "..", "Image");
+                imageDirPath = Path.GetFullPath(imageDirPath);
+
                 foreach (var variant in CurrentProduct.Variants)
                 {
                     variant.ProductId = CurrentProduct.Id;  // Всегда привязываем к продукту
@@ -547,6 +552,11 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
                     _context.Photos.RemoveRange(photosToRemove);
 
+                    foreach (var photoToRemove in photosToRemove)
+                    {
+                        File.Delete($"{imageDirPath}\\{photoToRemove.PhotoName}");
+                    }
+
                     foreach (var photo in variant.Photos)
                     {
                         photo.VariantId = variant.Id;  // Привязываем к вариации
@@ -555,6 +565,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
                         {
                             // Новая фотография
                             _context.Photos.Add(photo);
+                            File.Copy(photo.PhotoPath, $"{imageDirPath}/{photo.PhotoName}", true);
                         }
                         else
                         {
@@ -577,7 +588,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка: {ex.Message}\n{ex.InnerException?.Message}");
+            MessageBox.Show($"Ошибка при сохранении: {ex.Message}\n{ex.InnerException?.Message}");
         }
     }
 
@@ -668,17 +679,91 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
 
     private void ExitButton_Click(object sender, RoutedEventArgs e)
     {
-        new LoginWindow().Show();
-        this.Close();
+        DialogResult = false;
+        Close();
     }
 
     private void ManageParameters_Click(object sender, RoutedEventArgs e)
     {
-        //Открытие диалогового окна с параметрами
+        var editorParametersWindow = new ParametersWindow();
+        if (editorParametersWindow.ShowDialog() == true)
+        {
+            LoadData();
+        }
     }
 
     private void DeleteProduct_Click(object sender, RoutedEventArgs e)
     {
-        //Удаление товара полностью
+        var result = MessageBox.Show(
+        "Вы действительно хотите удалить этот товар со всеми вариациями и фотографиями?",
+        "Подтверждение удаления",
+        MessageBoxButton.YesNo,
+        MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            using var transaction = _context.Database.BeginTransaction();
+
+            // 1. Удаляем специфичные данные в зависимости от категории
+            switch (CurrentProduct.CategoryId)
+            {
+                case 1: // Диван
+                    var sofa = _context.Sofas.FirstOrDefault(s => s.ProductId == CurrentProduct.Id);
+                    if (sofa != null)
+                        _context.Sofas.Remove(sofa);
+                    break;
+                case 2: // Кресло
+                    var armchair = _context.Armchairs.FirstOrDefault(a => a.ProductId == CurrentProduct.Id);
+                    if (armchair != null)
+                        _context.Armchairs.Remove(armchair);
+                    break;
+                case 3: // Кровать
+                    var bed = _context.Beds.FirstOrDefault(b => b.ProductId == CurrentProduct.Id);
+                    if (bed != null)
+                        _context.Beds.Remove(bed);
+                    break;
+            }
+
+            // 2. Удаляем все вариации и связанные с ними фото
+            var variants = _context.Variants
+                .Include(v => v.Photos)
+                .Where(v => v.ProductId == CurrentProduct.Id)
+                .ToList();
+
+            string imageDirPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Image");
+            imageDirPath = Path.GetFullPath(imageDirPath);
+
+            foreach (var variant in variants)
+            {
+                // Удаляем файлы фотографий
+                foreach (var photo in variant.Photos)
+                {
+                    File.Delete($"{imageDirPath}\\{photo.PhotoName}");
+                }
+
+                // Удаляем записи о фотографиях из БД
+                _context.Photos.RemoveRange(variant.Photos);
+            }
+
+            // Удаляем вариации из БД
+            _context.Variants.RemoveRange(variants);
+
+            // 3. Удаляем сам товар
+            _context.Products.Remove(CurrentProduct);
+
+            _context.SaveChanges();
+            transaction.Commit();
+
+            MessageBox.Show("Товар успешно удален");
+            DialogResult = true;
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при удалении товара: {ex.Message}\n{ex.InnerException?.Message}");
+        }
     }
 }

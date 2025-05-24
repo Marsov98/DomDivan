@@ -1,4 +1,6 @@
-﻿namespace DomDivan.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DomDivan.Models;
 
 public class Variant
 {
@@ -18,4 +20,7 @@ public class Variant
     public int StockQuantity { get; set; } = 0;
 
     public List<PhotoProduct> Photos { get; set; } = new();
+
+    [NotMapped]
+    public virtual decimal? LastBuyPrice { get; set; }
 }

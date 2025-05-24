@@ -46,8 +46,8 @@ public partial class ParametersWindow : Window
     #region Общие методы
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {
-        new AdminProductsWindow().Show();
-        this.Close();
+        DialogResult = true;
+        Close();
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -74,7 +74,7 @@ public partial class ParametersWindow : Window
     {
         if (((Button)sender).Tag is Cloth selectedCloth)
         {
-            var editWindow = new EditParameterWindow("Редактирование ткани", selectedCloth.Name);
+            var editWindow = new EditParameterWindow("Редактирование ткани", "Ткань: ", selectedCloth.Name);
             if (editWindow.ShowDialog() == true)
             {
                 var cloth = _context.Cloths.Find(selectedCloth.Id);
@@ -183,7 +183,7 @@ public partial class ParametersWindow : Window
     {
         if (((Button)sender).Tag is Filler selectedFiller)
         {
-            var editWindow = new EditParameterWindow("Редактирование наполнителя", selectedFiller.Name);
+            var editWindow = new EditParameterWindow("Редактирование наполнителя", "Наполнитель: ", selectedFiller.Name);
             if (editWindow.ShowDialog() == true)
             {
                 var filler = _context.Fillers.Find(selectedFiller.Id);
@@ -234,7 +234,7 @@ public partial class ParametersWindow : Window
     {
         if (((Button)sender).Tag is FoldingMechanism selectedMechanism)
         {
-            var editWindow = new EditParameterWindow("Редактирование механизма", selectedMechanism.Name);
+            var editWindow = new EditParameterWindow("Редактирование механизма", "Механизм: ", selectedMechanism.Name);
             if (editWindow.ShowDialog() == true)
             {
                 var mechanism = _context.FoldingMechanisms.Find(selectedMechanism.Id);
@@ -285,7 +285,7 @@ public partial class ParametersWindow : Window
     {
         if (((Button)sender).Tag is SofaType selectedSofaType)
         {
-            var editWindow = new EditParameterWindow("Редактирование типа дивана", selectedSofaType.Name);
+            var editWindow = new EditParameterWindow("Редактирование типа дивана", "Тип: ", selectedSofaType.Name);
             if (editWindow.ShowDialog() == true)
             {
                 var sofaType = _context.SofaTypes.Find(selectedSofaType.Id);

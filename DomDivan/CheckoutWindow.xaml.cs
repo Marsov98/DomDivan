@@ -101,6 +101,8 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
                           $"Дата доставки: {CurrentOrder.DeliveryDate:dd.MM.yyyy}\n" +
                           $"Сумма заказа: {CurrentOrder.TotalPrice:C}",
                           "Заказ оформлен", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            CartService.Instance.ClearCart();
         }
         catch (Exception ex)
         {

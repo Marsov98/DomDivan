@@ -14,14 +14,14 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
 {
     private readonly DomDivanContext _context;
     private List<OrderView> _allOrders;
-    private int _lowStockItemsCount;
+    private int _notificationCount;
 
-    public int LowStockItemsCount
+    public int NotificationCount
     {
-        get => _lowStockItemsCount;
+        get => _notificationCount;
         set
         {
-            _lowStockItemsCount = value;
+            _notificationCount = value;
             OnPropertyChanged();
         }
     }
@@ -61,7 +61,8 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
                     CustomerName = o.CustomerName,
                     CustomerPhone = o.PhoneNumber,
                     DeliveryAddress = o.DeliveryAddress,
-                    DeliveryTime = o.DeliveryDate,
+                    DeliveryDate = o.DeliveryDate,
+                    CreateDate = o.OrderDate,
                     Status = o.Status,
                     TotalPrice = o.Items.Sum(oi => oi.UnitPrice * oi.Quantity),
                     ItemsCount = o.Items.Sum(oi => oi.Quantity),
@@ -75,13 +76,11 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
                         Quantity = oi.Quantity,
                         TotalPrice = oi.UnitPrice * oi.Quantity
                     })
-                .ToList()
-        })
+                .ToList()})
                 .ToList();
 
             // Загрузка количества товаров с малым запасом
-            LowStockItemsCount = _context.Variants
-                .Count(v => v.StockQuantity < 5);
+            NotificationCount = _allOrders.Count(v => v.IsNotification == true);
 
             ApplyFiltersAndSort();
         }
@@ -117,20 +116,26 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
         // Сортировка
         switch (SortComboBox.SelectedIndex)
         {
-            case 0: // По времени доставки (сначала ранние)
-                filtered = filtered.OrderBy(o => o.DeliveryTime);
+            case 0: // По дате доставки (сначала ранние)
+                filtered = filtered.OrderBy(o => o.DeliveryDate);
                 break;
-            case 1: // По времени доставки (сначала поздние)
-                filtered = filtered.OrderByDescending(o => o.DeliveryTime);
+            case 1: // По дате доставки (сначала поздние)
+                filtered = filtered.OrderByDescending(o => o.DeliveryDate);
                 break;
-            case 2: // По сумме (↑)
+            case 2: // По дате создания (сначала ранние)
+                filtered = filtered.OrderBy(o => o.CreateDate);
+                break;
+            case 3: // По дате создания (сначала поздние)
+                filtered = filtered.OrderByDescending(o => o.CreateDate);
+                break;
+            case 4: // По сумме (↑)
                 filtered = filtered.OrderBy(o => o.TotalPrice);
                 break;
-            case 3: // По сумме (↓)
+            case 5: // По сумме (↓)
                 filtered = filtered.OrderByDescending(o => o.TotalPrice);
                 break;
             default:
-                filtered = filtered.OrderByDescending(o => o.DeliveryTime);
+                filtered = filtered.OrderByDescending(o => o.DeliveryDate);
                 break;
         }
 
@@ -155,11 +160,6 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
     private void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         LoadData();
-    }
-
-    private void NotificationIcon_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        new LowStockNotificationWindow().ShowDialog();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

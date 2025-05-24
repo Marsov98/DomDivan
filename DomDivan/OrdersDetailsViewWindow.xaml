@@ -106,10 +106,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
             <!-- Шапка -->
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
             <!-- Основное содержимое -->
+            <RowDefinition Height="*"/>
+            <!-- Подвал -->
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Шапка (Header) -->
@@ -133,136 +135,151 @@
 
                 <!-- Кнопка выхода -->
                 <Button Grid.Column="2"
-                        Content="Выход" 
+                        Content="Назад" 
                         Style="{StaticResource ModernButton}"
                         Click="CloseButton_Click"/>
             </Grid>
         </Border>
 
         <!-- Основное содержимое -->
-        <Grid Grid.Row="1" Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <!-- Информация о заказе -->
-            <Border Grid.Row="0" 
-                    Background="White"
-                    BorderBrush="#FFE0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Padding="10">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Статус заказа:" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding Status}" 
-                               Style="{StaticResource OrderStatusStyle}"
-                               Margin="5,0,20,0"/>
-                    <TextBlock Text="Дата создания:" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CreatedDate, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" Margin="5,0,0,0"/>
-                </StackPanel>
-            </Border>
+                <!-- Информация о заказе - с выравниванием текста -->
+                <Border Grid.Row="0" 
+                        Background="White"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Статус заказа:" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Status}" 
+                                   Style="{StaticResource OrderStatusStyle}"
+                                   Margin="5,0,20,0" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="Дата создания:" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CreateDate, StringFormat='{}{0:dd.MM.yyyy}'}" 
+                                   Margin="5,0,0,0" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Информация о клиенте -->
-            <Border Grid.Row="1" 
-                    Background="White"
-                    BorderBrush="#FFE0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Padding="10"
-                    Margin="0,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                <!-- Информация о клиенте - с выравниванием текста -->
+                <Border Grid.Row="1" 
+                        Background="White"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10"
+                        Margin="0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Text="Клиент:" FontWeight="Bold" Grid.Column="0"/>
-                    <TextBlock Text="{Binding CustomerName}" Grid.Column="1" Margin="5,0,20,0"/>
-                    <TextBlock Text="Телефон:" FontWeight="Bold" Grid.Column="2"/>
-                    <TextBlock Text="{Binding CustomerPhone}" Grid.Column="3" Margin="5,0,0,0"/>
-                </Grid>
-            </Border>
+                        <TextBlock Text="Клиент:" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CustomerName}" Grid.Column="1" Margin="5,0,20,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Телефон:" FontWeight="Bold" Grid.Column="2" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CustomerPhone}" Grid.Column="3" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
 
-            <!-- Адрес и комментарий -->
-            <Border Grid.Row="2" 
-                    Background="White"
-                    BorderBrush="#FFE0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Padding="10"
-                    Margin="0,10">
-                <StackPanel>
-                    <TextBlock Text="Адрес доставки:" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding DeliveryAddress}"/>
-                    <TextBlock Text="Комментарий к заказу:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <Border BorderBrush="#FFE0E0E0" BorderThickness="1" CornerRadius="3" Padding="5" Background="White">
-                        <TextBlock Text="{Binding Comment}" TextWrapping="Wrap" MinHeight="50"/>
-                    </Border>
-                </StackPanel>
-            </Border>
+                <!-- Адрес и комментарий - с выравниванием текста -->
+                <Border Grid.Row="2" 
+                        Background="White"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10"
+                        Margin="0,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Адрес доставки:" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DeliveryAddress}" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Комментарий к заказу:" FontWeight="Bold" Margin="0,10,0,0"/>
+                        <Border BorderBrush="#FFE0E0E0" BorderThickness="1" CornerRadius="3" Padding="5" Background="White">
+                            <TextBlock Text="{Binding Comment}" TextWrapping="Wrap" MinHeight="50"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
 
-            <!-- Время доставки -->
-            <Border Grid.Row="3" 
-                    Background="White"
-                    BorderBrush="#FFE0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Padding="10"
-                    Margin="0,10">
-                <StackPanel>
-                    <TextBlock Text="Время доставки:" FontWeight="Bold"/>
-                    <DatePicker SelectedDate="{Binding DeliveryTime}"/>
-                </StackPanel>
-            </Border>
+                <!-- Время доставки - с выравниванием текста -->
+                <Border Grid.Row="3" 
+                        Background="White"
+                        BorderBrush="#FFE0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="10"
+                        Margin="0,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Дата доставки:" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <DatePicker SelectedDate="{Binding DeliveryDate}" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
 
-            <!-- Список товаров -->
-            <GroupBox Grid.Row="4" Header="Товары в заказе">
-                <ListView x:Name="ItemsListView">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding ProductTitle}" Width="200"/>
-                            <GridViewColumn Header="Вариация" DisplayMemberBinding="{Binding VariantTitle}" Width="200"/>
-                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding UnitPrice, StringFormat='{}{0:N2} руб.'}" Width="120"/>
-                            <GridViewColumn Header="Количество" DisplayMemberBinding="{Binding Quantity}" Width="80"/>
-                            <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding TotalPrice, StringFormat='{}{0:N2} руб.'}" Width="120"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </GroupBox>
+                <!-- Список товаров -->
+                <GroupBox Grid.Row="4" Header="Товары в заказе" Margin="0,10">
+                    <ListView x:Name="ItemsListView" Height="200">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding ProductTitle}" Width="200"/>
+                                <GridViewColumn Header="Вариация" DisplayMemberBinding="{Binding VariantTitle}" Width="200"/>
+                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding UnitPrice, StringFormat='{}{0:N2} руб.'}" Width="120"/>
+                                <GridViewColumn Header="Количество" DisplayMemberBinding="{Binding Quantity}" Width="80"/>
+                                <GridViewColumn Header="Сумма" DisplayMemberBinding="{Binding TotalPrice, StringFormat='{}{0:N2} руб.'}" Width="120"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </GroupBox>
 
-            <!-- Панель управления -->
-            <Border Grid.Row="5" 
-                    Background="White"
-                    BorderBrush="#FFE0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Padding="10"
-                    Margin="0,10">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ComboBox x:Name="StatusComboBox"
-                              SelectedValue="{Binding Status}"
-                              SelectedValuePath="Content"
-                              DisplayMemberPath="Content">
-                        <ComboBoxItem Content="Новый"/>
-                        <ComboBoxItem Content="В обработке"/>
-                        <ComboBoxItem Content="Доставка"/>
-                        <ComboBoxItem Content="Завершен"/>
-                        <ComboBoxItem Content="Отменен"/>
-                    </ComboBox>
-                    <Button Content="Сохранить" 
-                            Style="{StaticResource ModernButton}"
-                            Width="120"
-                            Margin="10,0,0,0"
-                            Click="SaveButton_Click"/>
-                </StackPanel>
-            </Border>
-        </Grid>
+                
+            </Grid>
+        </ScrollViewer>
+        
+        <!-- Панель управления -->
+        <Border Grid.Row="2" 
+                Background="White"
+                BorderBrush="#FFE0E0E0"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="10"
+                Margin="0,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <ComboBox x:Name="StatusComboBox"
+                          SelectedValue="{Binding Status}"
+                          SelectedItem="{Binding Status}"
+                          SelectedValuePath="Content"
+                          DisplayMemberPath="Content">
+                    <ComboBoxItem Content="Новый"/>
+                    <ComboBoxItem Content="В обработке"/>
+                    <ComboBoxItem Content="Доставка"/>
+                    <ComboBoxItem Content="Завершен"/>
+                    <ComboBoxItem Content="Отменен"/>
+                </ComboBox>
+                <Button Content="Сохранить" 
+                        Style="{StaticResource ModernButton}"
+                        Width="120"
+                        Margin="10,0,0,0"
+                        Click="SaveButton_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

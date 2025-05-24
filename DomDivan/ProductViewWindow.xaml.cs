@@ -227,13 +227,13 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(HasSofaTypes));
     }
 
-    private void LoadImage(string imagePath)
+    private void LoadImage(string imageDirPath)
     {
         try
         {
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
-            bitmap.UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute);
+            bitmap.UriSource = new Uri(imageDirPath, UriKind.RelativeOrAbsolute);
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
             MainImage.Source = bitmap;

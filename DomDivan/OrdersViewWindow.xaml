@@ -14,6 +14,8 @@
         Background="#FFF5F5F5">
 
     <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        
         <!-- Стиль кнопок -->
         <Style x:Key="ModernButton" TargetType="Button">
             <Setter Property="Background" Value="#FF1A1A1A"/>
@@ -132,9 +134,8 @@
                       Width="40"
                       Height="40"
                       Cursor="Hand"
-                      Margin="0,0,20,0"
-                      MouseDown="NotificationIcon_MouseDown">
-                    <Image Source="/white_notification_icon.png" 
+                      Margin="0,0,20,0">
+                    <Image Source="Image/white_notification_icon.png"
                            Width="24"
                            Height="24"/>
                     <Border Background="Red"
@@ -144,7 +145,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top">
                         <TextBlock x:Name="LowQuantityCount"
-                                   Text="{Binding LowStockItemsCount}"
+                                   Text="{Binding NotificationCount}"
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Center"
                                    Foreground="White"
@@ -216,8 +217,10 @@
                         <Label Content="Сортировка:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <ComboBox x:Name="SortComboBox" Width="180" 
                                   SelectionChanged="SortChanged">
-                            <ComboBoxItem Content="По времени доставки (сначала ранние)"/>
-                            <ComboBoxItem Content="По времени доставки (сначала поздние)"/>
+                            <ComboBoxItem Content="По дате доставки (сначала ранние)"/>
+                            <ComboBoxItem Content="По дате доставки (сначала поздние)"/>
+                            <ComboBoxItem Content="По дате создания (сначала ранние)"/>
+                            <ComboBoxItem Content="По дате создания (сначала поздние)"/>
                             <ComboBoxItem Content="По сумме (↑)"/>
                             <ComboBoxItem Content="По сумме (↓)"/>
                         </ComboBox>
@@ -234,72 +237,97 @@
             <ListView Grid.Row="1" 
                       x:Name="OrdersListView"
                       SelectionChanged="ViewSelectedOrder_Click">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Margin" Value="0,0,0,10"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Border Background="White" 
                                 CornerRadius="5"
-                                Margin="0,0,0,5"
-                                Padding="10">
+                                Padding="15">
                             <Grid>
                                 <Grid.RowDefinitions>
+                                    <!-- Дата создания, сумма, количество -->
                                     <RowDefinition Height="Auto"/>
+                                    <!-- Статус -->
                                     <RowDefinition Height="Auto"/>
+                                    <!-- Клиент и телефон -->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Дата доставки -->
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Адрес -->
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Первая строка: номер, время, сумма, статус -->
-                                <TextBlock Grid.Row="0" Grid.Column="0" 
-                                           Text="{Binding OrderId}" 
+                                <!-- Номер заказа -->
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="{Binding OrderId, StringFormat='{}№{0}'}" 
                                            FontWeight="Bold" 
-                                           FontSize="14"
-                                           Margin="0,0,10,5"/>
+                                           FontSize="16"
+                                           Margin="0,0,10,0"/>
 
-                                <StackPanel Grid.Row="0" Grid.Column="1" 
-                                            Orientation="Horizontal"
-                                            VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding DeliveryTime, StringFormat='{}Доставка: {0:dd.MM.yyyy HH:mm}'}"
-                                               FontSize="14"/>
+                                <!-- Иконка уведомления -->
+                                <Image Grid.Row="1" Grid.Column="0" 
+                                       Source="Image/black_notification_icon.png"
+                                       Width="20" Height="20"
+                                       Margin="0,0,10,0"
+                                       Visibility="{Binding IsNotification, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                                <!-- Первая строка: дата создания, сумма, количество -->
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding CreateDate, StringFormat='{}Создан: {0:dd.MM.yyyy}'}"
+                                               FontSize="14"
+                                               Margin="0,0,15,0"/>
+
                                     <TextBlock Text="{Binding TotalPrice, StringFormat='{} (Сумма: {0:N2} руб.'}" 
                                                Margin="5,0,0,0"
                                                FontSize="14"/>
+                                    
                                     <TextBlock Text="{Binding ItemsCount, StringFormat='{}, товаров: {0})'}" 
                                                Margin="2,0,0,0"
                                                FontSize="14"/>
                                 </StackPanel>
 
-                                <TextBlock Grid.Row="0" Grid.Column="2" 
-                                           Text="{Binding Status}" 
-                                           Style="{StaticResource OrderStatusStyle}"/>
+                                <!-- Вторая строка: статус -->
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <TextBlock Text="Статус: " FontSize="14"/>
+                                    <TextBlock Text="{Binding Status}" Style="{StaticResource OrderStatusStyle}"/>
+                                </StackPanel>
 
-                                <!-- Вторая строка: информация о клиенте -->
-                                <TextBlock Grid.Row="1" Grid.Column="0" 
-                                           Text="Клиент:" 
-                                           Margin="0,5,10,0"
-                                           FontSize="14"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" 
-                                           Text="{Binding CustomerName}" 
-                                           Margin="0,5,0,0"
-                                           FontSize="14"/>
-                                <TextBlock Grid.Row="1" Grid.Column="2" 
-                                           Text="{Binding CustomerPhone}" 
-                                           Margin="0,5,0,0"
-                                           FontSize="14"/>
+                                <!-- Третья строка: информация о клиенте -->
+                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <TextBlock Text="Клиент: " 
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding CustomerName}" 
+                                               FontSize="14"
+                                               Margin="0,0,15,0"/>
+                                    <TextBlock Text="{Binding CustomerPhone}" 
+                                               FontSize="14"/>
+                                </StackPanel>
 
-                                <!-- Третья строка: адрес -->
-                                <TextBlock Grid.Row="2" Grid.Column="0" 
-                                           Text="Адрес:" 
-                                           Margin="0,5,10,0"
-                                           FontSize="14"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Text="{Binding DeliveryAddress}" 
-                                           Margin="0,5,0,0" 
-                                           TextWrapping="Wrap"
-                                           FontSize="14"/>
+                                <!-- Четвертая строка: дата доставки -->
+                                <TextBlock Grid.Row="3" Grid.Column="1" 
+                                           Text="{Binding DeliveryDate, StringFormat='{}Дата доставки: {0:dd.MM.yyyy}'}"
+                                           FontSize="14"
+                                           Margin="0,5,0,0"/>
+
+                                <!-- Пятая строка: адрес -->
+                                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <TextBlock Text="Адрес: " 
+                                               FontSize="14"/>
+                                    <TextBlock Text="{Binding DeliveryAddress}" 
+                                               FontSize="14"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>

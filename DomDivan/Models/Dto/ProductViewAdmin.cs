@@ -34,4 +34,7 @@ public class ProductViewAdmin
     }
 
     public List<Variant> Variants { get; set; } = new();
+    public virtual int? NotificationCount => Variants.Count(v => v.StockQuantity < 5) == 0 
+                                             ? null :
+                                             Variants.Count(v => v.StockQuantity < 5);
 }

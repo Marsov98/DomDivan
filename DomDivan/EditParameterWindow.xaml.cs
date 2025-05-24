@@ -11,10 +11,10 @@ public partial class EditParameterWindow : Window
     public string ParameterName { get; }
     public string ParameterValue { get; set; }
 
-    public EditParameterWindow(string windowTitle, string currentValue)
+    public EditParameterWindow(string windowTitle, string parameterName, string currentValue)
     {
         WindowTitle = windowTitle;
-        ParameterName = windowTitle.Replace("Редактирование ", "") + ':';
+        ParameterName = parameterName;
         ParameterValue = currentValue;
 
         InitializeComponent();

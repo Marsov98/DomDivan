@@ -29,7 +29,7 @@ public partial class OrdersDetailsViewWindow : Window
             if (order != null)
             {
                 order.Status = _order.Status;
-                order.DeliveryDate = _order.DeliveryTime;
+                order.DeliveryDate = _order.DeliveryDate;
 
                 //_context.Orders.Update(order);
                 _context.SaveChanges();

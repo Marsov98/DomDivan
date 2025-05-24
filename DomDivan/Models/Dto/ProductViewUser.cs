@@ -59,7 +59,7 @@ public class ProductViewUser
     }
 
     public string Photo { get; set; } = "/Image/picture.png";
-    public virtual string? ImagePath
+    public virtual string? imageDirPath
     {
         get
         {

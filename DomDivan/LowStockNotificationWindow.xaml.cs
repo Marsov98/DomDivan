@@ -38,8 +38,8 @@ public partial class LowStockNotificationWindow : Window
                     .Include(p => p.Supply)
                     .ThenInclude(s => s.Supplier)
                     .Where(p => p.VariantId == variant.Id)
-                    .OrderByDescending(p => p.Supply.SupplyDate)
-                    .Take(3) // Берем 3 последних поставки
+                    .GroupBy(p => p.Supply.SupplierId)
+                    .Select(g => g.OrderByDescending(p => p.Supply.SupplyDate).First())
                     .ToList();
 
                 var product = new SmallQuantityProductView

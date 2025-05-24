@@ -151,7 +151,7 @@
                   Height="35"
                   Cursor="Hand"
                   MouseDown="GridIcon_MouseDown">
-                <Image Source="/black_notification_icon.png" 
+                <Image Source="Image/black_notification_icon.png" 
                        Width="24"
                        Height="24"/>
                 <Border Background="Red"
@@ -220,6 +220,30 @@
                     <Expander BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
+                                <!-- Иконка уведомлений -->
+                                <Grid Width="40"
+                                      Height="40"
+                                      Cursor="Hand"
+                                      Margin="0,0,10,0"
+                                      Visibility="{Binding NotificationCount, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <Image Source="Image/black_notification_icon.png"
+                                           Width="24"
+                                           Height="24"/>
+                                    <Border Background="Red"
+                                            Width="20"
+                                            Height="20"
+                                            CornerRadius="10"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top">
+                                        <TextBlock Text="{Binding NotificationCount}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="White"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"/>
+                                    </Border>
+                                </Grid>
+
                                 <TextBlock Text="{Binding FullName}" Width="250" Margin="5" FontSize="14"/>
                                 <!-- Блок цены -->
                                 <StackPanel HorizontalAlignment="Center"
