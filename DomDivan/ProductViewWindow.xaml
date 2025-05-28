@@ -245,7 +245,7 @@
                             <StackPanel Orientation="Horizontal" 
                                         VerticalAlignment="Center" 
                                         Margin="10,0,0,0">
-                                <TextBlock Text="{Binding CurrentVariant.Product.Price, StringFormat='{}{0:C}'}" 
+                                <TextBlock Text="{Binding CurrentVariant.Product.Price, StringFormat='{}{0:N2} руб.'}" 
                                            FontSize="18" 
                                            TextDecorations="Strikethrough" 
                                            Foreground="Gray" 
@@ -487,9 +487,23 @@
 
         <!-- Подвал с кнопкой добавления в корзину -->
         <Border Grid.Row="2" Background="White" BorderBrush="#FFE0E0E0" BorderThickness="0,1,0,0" Padding="20">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Visibility="{Binding IsVariantNotFound, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                <!-- Блок "Нет в наличии" -->
+                <Border Background="#FFF0F0F0"
+                        CornerRadius="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Padding="12,8"
+                        Visibility="{Binding OutOfStock, Converter={StaticResource BoolToVisibilityConverter}}">    
+                    <TextBlock Text="Нет в наличии"
+                               Foreground="#FF606060"
+                               FontWeight="SemiBold"/>
+                </Border>
+
                 <!-- Кнопка "Добавить в корзину" (видна, когда товара нет в корзине) -->
-                <Button x:Name="AddToCartButton" 
+                <StackPanel Visibility="{Binding OutOfStock, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <Button x:Name="AddToCartButton" 
                         Content="Добавить в корзину" 
                         Width="180" 
                         Height="45" 
@@ -497,6 +511,7 @@
                         Style="{StaticResource ModernButton}"
                         Click="AddToCart_Click"
                         Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                </StackPanel>
 
                 <!-- Элементы управления количеством (видны, когда товар в корзине) -->
                 <StackPanel Orientation="Horizontal"

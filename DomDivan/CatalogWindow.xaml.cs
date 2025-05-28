@@ -188,6 +188,8 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
             Filler = x.Sofa?.Filler?.Name ?? x.Armchair?.Filler?.Name,
             Mechanism = x.Sofa?.FoldingMechanism?.Name,
             Photo = x.Variant.Photos.First(p => p.IsPrimary).PhotoName,
+            StockQuantity = x.Variant.StockQuantity,
+            OutOfStock = x.Variant.StockQuantity == 0,
             IsInCart = false
         }).ToList();
     }

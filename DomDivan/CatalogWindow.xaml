@@ -27,7 +27,9 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="MinWidth" Value="100"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -411,14 +413,27 @@
 
                                         <!-- Кнопки корзины -->
                                         <Grid Grid.Row="3" Margin="0,10,0,0">
-                                            <!-- Добавить в корзину -->
-                                            <Button x:Name="AddToCartButton"
+                                            <!-- Блок "Нет в наличии" -->
+                                            <Border Background="#FFF0F0F0"
+                                                    CornerRadius="4"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Padding="12,8"
+                                                    Visibility="{Binding OutOfStock, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <TextBlock Text="Нет в наличии"
+                                                           Foreground="#FF606060"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+
+                                            <Grid Visibility="{Binding OutOfStock, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                <!-- Добавить в корзину -->
+                                                <Button x:Name="AddToCartButton"
                                                     Content="Добавить в корзину"
                                                     Style="{StaticResource ModernButton}"
                                                     HorizontalAlignment="Center"
                                                     Click="AddToCart_Click"
                                                     Visibility="{Binding IsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-
+                                            </Grid>
                                             <!-- Управление количеством -->
                                             <StackPanel Orientation="Horizontal"
                                                         HorizontalAlignment="Center"

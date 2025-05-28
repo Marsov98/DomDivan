@@ -1,16 +1,10 @@
 ﻿using DomDivan.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace DomDivan;
@@ -22,6 +16,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     private int _currentPhotoIndex = 0;
     private bool _isInCart;
     private bool _isVariantNotFound;
+    private bool _outOfStock;
     private Models.ColorVariant _selectedColor;
     private Cloth _selectedCloth;
     private SofaType? _selectedSofaType;
@@ -64,6 +59,16 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         set
         {
             _isVariantNotFound = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool OutOfStock
+    {
+        get => _outOfStock;
+        set
+        {
+            _outOfStock = value;
             OnPropertyChanged();
         }
     }
@@ -373,6 +378,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     {
         IsInCart = CurrentVariant != null && CartService.Instance.IsInCart(CurrentVariant.Id);
         CartQuantity = CartService.Instance.GetItemQuantity(CurrentVariant?.Id ?? 0);
+        OutOfStock = CurrentVariant.StockQuantity == 0;
         OnPropertyChanged(nameof(CartQuantity));
     }
 
@@ -393,6 +399,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         else
         {
             IsVariantNotFound = true;
+            OutOfStock = true;
         }
     }
 

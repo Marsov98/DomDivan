@@ -214,7 +214,7 @@
                         </StackPanel>
                         <TextBlock Text="Комментарий к заказу:" FontWeight="Bold" Margin="0,10,0,0"/>
                         <Border BorderBrush="#FFE0E0E0" BorderThickness="1" CornerRadius="3" Padding="5" Background="White">
-                            <TextBlock Text="{Binding Comment}" TextWrapping="Wrap" MinHeight="50"/>
+                            <TextBox Text="{Binding Comment}" TextWrapping="Wrap" MinHeight="50"/>
                         </Border>
                     </StackPanel>
                 </Border>

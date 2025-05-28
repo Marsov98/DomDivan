@@ -68,4 +68,5 @@ public class ProductViewUser
     }
 
     public int StockQuantity { get; set; }
+    public bool OutOfStock { get; set; } = false;
 }
