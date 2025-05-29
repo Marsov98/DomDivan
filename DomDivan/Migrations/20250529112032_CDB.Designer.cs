@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DomDivan.Migrations
 {
     [DbContext(typeof(DomDivanContext))]
-    [Migration("20250405124702_DB2")]
-    partial class DB2
+    [Migration("20250529112032_CDB")]
+    partial class CDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,7 +97,7 @@ namespace DomDivan.Migrations
                     b.ToTable("Cloths");
                 });
 
-            modelBuilder.Entity("DomDivan.Models.Color", b =>
+            modelBuilder.Entity("DomDivan.Models.ColorVariant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -179,11 +179,16 @@ namespace DomDivan.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PhoneNumber");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -200,8 +205,8 @@ namespace DomDivan.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("VariantId")
                         .HasColumnType("INTEGER");
@@ -272,6 +277,48 @@ namespace DomDivan.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
+            modelBuilder.Entity("DomDivan.Models.ProductInSupply", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SupplyId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("VariantId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplyId");
+
+                    b.HasIndex("VariantId");
+
+                    b.ToTable("ProductsInSupply");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("DomDivan.Models.Sofa", b =>
                 {
                     b.Property<int>("Id")
@@ -321,6 +368,87 @@ namespace DomDivan.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SofaTypes");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.Supplier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContactPerson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Suppliers");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.Supply", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SupplyDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("Supplies");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DomDivan.Models.Variant", b =>
@@ -387,6 +515,17 @@ namespace DomDivan.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("DomDivan.Models.Order", b =>
+                {
+                    b.HasOne("DomDivan.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DomDivan.Models.OrderItem", b =>
                 {
                     b.HasOne("DomDivan.Models.Order", "Order")
@@ -428,6 +567,25 @@ namespace DomDivan.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("DomDivan.Models.ProductInSupply", b =>
+                {
+                    b.HasOne("DomDivan.Models.Supply", "Supply")
+                        .WithMany("ProductInSupply")
+                        .HasForeignKey("SupplyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DomDivan.Models.Variant", "Variant")
+                        .WithMany()
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supply");
+
+                    b.Navigation("Variant");
+                });
+
             modelBuilder.Entity("DomDivan.Models.Sofa", b =>
                 {
                     b.HasOne("DomDivan.Models.Filler", "Filler")
@@ -455,6 +613,28 @@ namespace DomDivan.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("DomDivan.Models.Supply", b =>
+                {
+                    b.HasOne("DomDivan.Models.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.User", b =>
+                {
+                    b.HasOne("DomDivan.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("DomDivan.Models.Variant", b =>
                 {
                     b.HasOne("DomDivan.Models.Cloth", "Cloth")
@@ -463,7 +643,7 @@ namespace DomDivan.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DomDivan.Models.Color", "Color")
+                    b.HasOne("DomDivan.Models.ColorVariant", "Color")
                         .WithMany()
                         .HasForeignKey("ColorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -497,6 +677,11 @@ namespace DomDivan.Migrations
             modelBuilder.Entity("DomDivan.Models.Product", b =>
                 {
                     b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("DomDivan.Models.Supply", b =>
+                {
+                    b.Navigation("ProductInSupply");
                 });
 
             modelBuilder.Entity("DomDivan.Models.Variant", b =>

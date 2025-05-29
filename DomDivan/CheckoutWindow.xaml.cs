@@ -1,4 +1,5 @@
 ﻿using DomDivan.Models;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -91,6 +92,14 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
             using(var context = new DomDivanContext())
             {
                 context.Orders.Add(CurrentOrder);
+
+                foreach (var item in CurrentOrder.Items)
+                {
+                    var currentItem = context.Variants.FirstOrDefault(v => v.Id == item.VariantId);
+                    currentItem.StockQuantity -= item.Quantity;
+                    context.Variants.Update(currentItem);
+                }
+
                 context.SaveChanges();
             }
 
@@ -102,7 +111,27 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
                           $"Сумма заказа: {CurrentOrder.TotalPrice:C}",
                           "Заказ оформлен", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            CartService.Instance.ClearCart();
+            ObservableCollection<CartView> CartItems = new();
+
+            foreach (var cartItem in CartService.Instance.CartItems)
+            {
+                CartItems.Add(new CartView
+                {
+                    VariantId = cartItem.Variant.Id,
+                    Title = $"{cartItem.Variant.Product.Category.Name} \"{cartItem.Variant.Product.Name}\"",
+                    PrimaryPhoto = cartItem.Variant.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoName
+                                ?? cartItem.Variant.Photos.FirstOrDefault()?.PhotoName,
+                    Color = cartItem.Variant.Color.Name,
+                    Cloth = cartItem.Variant.Cloth.Name,
+                    SofaType = cartItem.Variant.SofaType?.Name,
+                    Price = cartItem.Variant.Product.Price,
+                    Discount = cartItem.Variant.Product.Discount,
+                    DiscountPrice = cartItem.Variant.Product.DiscountPrice,
+                    Quantity = cartItem.Quantity
+                });
+            }
+
+            GenerateWord.GenerateWordReceipt(CartItems, CurrentOrder);
         }
         catch (Exception ex)
         {
@@ -112,6 +141,7 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
 
 
 
+        CartService.Instance.ClearCart();
         new CatalogWindow().Show();
         this.Close();
     }

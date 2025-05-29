@@ -18,7 +18,7 @@ public class BoolToVisibilityConverter : System.Windows.Data.IValueConverter
     }
 }
 
-public class InverseBooleanToVisibilityConverter : System.Windows.Data.IValueConverter
+public class InverseBoolToVisibilityConverter : System.Windows.Data.IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

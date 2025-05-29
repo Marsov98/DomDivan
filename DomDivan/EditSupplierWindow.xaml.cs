@@ -1,4 +1,6 @@
 ﻿using DomDivan.Models;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace DomDivan;
@@ -6,10 +8,13 @@ namespace DomDivan;
 /// <summary>
 /// Логика взаимодействия для EditSupplierWindow.xaml
 /// </summary>
-public partial class EditSupplierWindow : Window
+public partial class EditSupplierWindow : Window, INotifyPropertyChanged
 {
     private readonly Supplier _supplierToEdit;
-    private readonly bool _isEditMode;
+    public bool _isEditMode;
+
+    public Supplier Supplier { get; set; }
+    public string WindowTitle => _isEditMode ? "Редактирование поставщика" : "Добавление нового поставщика";
 
     public EditSupplierWindow(Supplier supplier = null)
     {
@@ -20,19 +25,21 @@ public partial class EditSupplierWindow : Window
             // Режим редактирования
             _supplierToEdit = supplier;
             _isEditMode = true;
-            Title = "Редактирование поставщика";
 
-            // Заполняем поля данными
-            CompanyNameTextBox.Text = supplier.CompanyName;
-            ContactPersonTextBox.Text = supplier.ContactPerson;
-            PhoneNumberTextBox.Text = supplier.PhoneNumber;
+            Supplier = new Supplier() 
+            {
+                CompanyName = supplier.CompanyName,
+                ContactPerson = supplier.ContactPerson,
+                PhoneNumber = supplier.PhoneNumber
+            };     
         }
         else
         {
             // Режим создания нового
             _isEditMode = false;
-            Title = "Добавление нового поставщика";
         }
+
+        DataContext = this;
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -59,6 +66,8 @@ public partial class EditSupplierWindow : Window
                         supplierInDb.CompanyName = CompanyNameTextBox.Text;
                         supplierInDb.ContactPerson = ContactPersonTextBox.Text;
                         supplierInDb.PhoneNumber = PhoneNumberTextBox.Text;
+
+                        context.Suppliers.Update(supplierInDb);
                     }
                 }
                 else
@@ -90,4 +99,8 @@ public partial class EditSupplierWindow : Window
         DialogResult = false;
         Close();
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

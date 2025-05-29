@@ -10,99 +10,6 @@
         Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5">
-
-    <Window.Resources>
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <local:BoolToYesNoConverter x:Key="BoolToYesNoConverter" />
-        <local:HexToBrushConverter x:Key="HexToBrushConverter" />
-        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
-        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
-
-        <!-- Стиль для кнопок -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для RadioButton вариаций -->
-        <Style x:Key="VariationRadioButtonStyle" TargetType="RadioButton">
-            <Setter Property="Margin" Value="0,0,10,5"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="3"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="BorderBrush" Value="#FF4081"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#F5F5F5"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для кнопок навигации изображений -->
-        <Style x:Key="ImageNavButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#80000000"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Width" Value="40"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="20">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#99000000"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
@@ -216,7 +123,7 @@
                                         CornerRadius="3"
                                         MouseDown="Thumbnail_MouseDown" 
                                         Cursor="Hand">
-                                    <Image Source="{Binding PhotoName}" 
+                                    <Image Source="{Binding PhotoPath}" 
                                            Width="80" 
                                            Height="80" 
                                            Stretch="Uniform"/>
@@ -533,7 +440,8 @@
                             Width="40" 
                             Height="40"
                             Style="{StaticResource ModernButton}"
-                            Click="IncreaseQuantity_Click"/>
+                            Click="IncreaseQuantity_Click"
+                            Visibility="{Binding IsMaxQuantity, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                 </StackPanel>
             </StackPanel>
         </Border>

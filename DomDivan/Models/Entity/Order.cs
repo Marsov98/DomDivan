@@ -12,6 +12,9 @@ public class Order
     public string DeliveryAddress { get; set; }
     public string? Comments { get; set; }
 
+    public int UserId { get; set; }
+    public User User { get; set; }
+
     public List<OrderItem> Items { get; set; } = new();
     public virtual decimal TotalPrice => Items.Sum(i => i.TotalPrice);
 }

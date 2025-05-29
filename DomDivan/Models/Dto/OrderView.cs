@@ -9,6 +9,7 @@ public class OrderView
     public DateTime DeliveryDate { get; set; }
     public DateTime CreateDate { get; set; }
     public string Status { get; set; }
+    public string Comments { get; set; }
     public decimal TotalPrice { get; set; }
     public int ItemsCount { get; set; }
 

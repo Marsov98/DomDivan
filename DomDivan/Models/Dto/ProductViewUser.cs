@@ -5,7 +5,8 @@ namespace DomDivan.Models;
 
 public class ProductViewUser
 {
-    public int IdVariant { get; set; }
+    public int VariantId { get; set; }
+    public int ProductId { get; set; }
 
     public string Category { get; set; } = "Без категории";
     public string Name { get; set; } = "Без названия";
@@ -19,6 +20,7 @@ public class ProductViewUser
 
     public string Color { get; set; }
     public string Cloth { get; set; }
+    public string? SofaType { get; set; }
     public string? Filler { get; set; }
     public string? Mechanism { get; set; }
     public virtual string? Description 
@@ -28,7 +30,11 @@ public class ProductViewUser
             var parts = $"{Color}, {Cloth}";
             if (!string.IsNullOrEmpty(Filler))
             {
-                parts += ", " + Filler ;
+                parts += ", " + Filler;
+            }
+            if (!string.IsNullOrEmpty(SofaType))
+            {
+                parts += ",\n" + SofaType;
             }
             if (!string.IsNullOrEmpty(Mechanism))
             {
@@ -45,6 +51,16 @@ public class ProductViewUser
         set
         {
             _isInCart = value;
+        }
+    }
+
+    private bool _isMaxQuantity;
+    public bool IsMaxQuantity
+    {
+        get => _isMaxQuantity;
+        set
+        {
+            _isMaxQuantity = value;
         }
     }
 

@@ -30,7 +30,7 @@ public partial class CartWindow : Window, INotifyPropertyChanged
         {
             CartItems.Add(new CartView
             {
-                IdVariant = cartItem.Variant.Id,
+                VariantId = cartItem.Variant.Id,
                 Title = $"{cartItem.Variant.Product.Category.Name} \"{cartItem.Variant.Product.Name}\"",
                 PrimaryPhoto = cartItem.Variant.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoName
                             ?? cartItem.Variant.Photos.FirstOrDefault()?.PhotoName,

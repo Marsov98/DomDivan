@@ -4,78 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DomDivan"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Товары с малым количеством на складе" 
         Height="650" Width="900"
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5">
-
-    <Window.Resources>
-        <!-- Стиль для кнопок -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10 5"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для подсветки низкого количества -->
-        <Style x:Key="LowStockStyle" TargetType="TextBlock">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="{x:Static sys:Int32.MaxValue}">
-                    <Setter Property="Foreground" Value="Orange"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="1">
-                    <Setter Property="Foreground" Value="Red"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="2">
-                    <Setter Property="Foreground" Value="Red"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="3">
-                    <Setter Property="Foreground" Value="Orange"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="4">
-                    <Setter Property="Foreground" Value="Orange"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding StockQuantity}" Value="0">
-                    <Setter Property="Foreground" Value="Red"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для ListView -->
-        <Style TargetType="ListView">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-    </Window.Resources>
-
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>

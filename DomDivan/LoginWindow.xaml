@@ -11,57 +11,6 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#FFF5F5F5">
-
-    <Window.Resources>
-        <!-- Стиль для кнопок -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для текстового поля "Логин" -->
-        <Style x:Key="ModernLoginTextBox" TargetType="TextBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-
-        <!-- Стиль для текстового поля "Пароль" -->
-        <Style x:Key="ModernPasswordTextBox" TargetType="PasswordBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>

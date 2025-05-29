@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -113,6 +114,8 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         set { _columnCount = value; OnPropertyChanged(); }
     }
 
+    public string imageDirPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Image"));
+
     #endregion
 
     public CatalogWindow()
@@ -155,12 +158,15 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
 
     private async Task<List<ProductViewUser>> LoadProductsAsync(DomDivanContext context)
     {
+
+
         var variantsWithDetails = await context.Variants
             .AsNoTracking()
             .Include(v => v.Product)
                 .ThenInclude(p => p.Category)
             .Include(v => v.Color)
             .Include(v => v.Cloth)
+            .Include(v => v.SofaType)
             .Include(v => v.Photos)
             .Select(v => new
             {
@@ -178,16 +184,18 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
 
         return variantsWithDetails.Select(x => new ProductViewUser
         {
-            IdVariant = x.Variant.Id,
+            VariantId = x.Variant.Id,
+            ProductId = x.Variant.ProductId,
             Name = x.Variant.Product.Name,
             Category = x.Variant.Product.Category.Name,
             Price = x.Variant.Product.Price,
             Discount = x.Variant.Product.Discount,
             Color = x.Variant.Color.Name,
             Cloth = x.Variant.Cloth.Name,
+            SofaType = x.Variant.SofaType?.Name,
             Filler = x.Sofa?.Filler?.Name ?? x.Armchair?.Filler?.Name,
             Mechanism = x.Sofa?.FoldingMechanism?.Name,
-            Photo = x.Variant.Photos.First(p => p.IsPrimary).PhotoName,
+            Photo = $"{imageDirPath}\\{x.Variant.Photos.First(p => p.IsPrimary).PhotoName}",
             StockQuantity = x.Variant.StockQuantity,
             OutOfStock = x.Variant.StockQuantity == 0,
             IsInCart = false
@@ -345,8 +353,9 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
             {
                 if (item != null)
                 {
-                    item.IsInCart = CartService.Instance.IsInCart(item.IdVariant);
-                    item.CartQuantity = CartService.Instance.GetItemQuantity(item.IdVariant);
+                    item.IsInCart = CartService.Instance.IsInCart(item.VariantId);
+                    item.CartQuantity = CartService.Instance.GetItemQuantity(item.VariantId);
+                    item.IsMaxQuantity = CartService.Instance.IsMaxQuantity(item.VariantId, item.StockQuantity);
                 }
             }
 
@@ -381,7 +390,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         // Логика обработки изменения размеров окна
         double newWidth = e.NewSize.Width;
         // Минимальная ширина карточки 250 пикселей
-        double cardWidth = 300;
+        double cardWidth = 310;
         // Добавляем отступы между карточками
         double spacing = 20;
         ColumnCount = Math.Max(1, (int)((newWidth - 250) / (cardWidth + spacing)));
@@ -392,38 +401,15 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         ApplyFilters();
     }
 
-    private void ViewSelected_Click(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void ViewSelected_Click(object sender, SelectionChangedEventArgs e)
     {
         var selectedItem = (sender as ListBox).SelectedItem as ProductViewUser;
 
         if (selectedItem != null)
         {
-            using (var db = new DomDivanContext())
-            {
-                int productId = db.Variants
-                    .Where(v => v.Id == selectedItem.IdVariant)
-                    .Select(x => x.ProductId)
-                    .FirstOrDefault();
+            new ProductViewWindow(selectedItem.ProductId, selectedItem.VariantId).Show();
+            this.Close();
 
-                var product = db.Products
-                    .AsNoTracking()
-                    .Include(p => p.Category)
-                    .Include(p => p.Variants)
-                        .ThenInclude(v => v.Color)
-                    .Include(p => p.Variants)
-                        .ThenInclude(v => v.Cloth)
-                    .Include(p => p.Variants)
-                        .ThenInclude(v => v.SofaType)
-                    .Include(p => p.Variants)
-                        .ThenInclude(v => v.Photos)
-                    .FirstOrDefault(p => p.Id == productId);
-
-                if (product != null)
-                {
-                    new ProductViewWindow(product, selectedItem.IdVariant).Show();
-                    this.Close();
-                }
-            }
         }
     }
 
@@ -442,7 +428,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
                     .Include(v => v.Cloth)
                     .Include(v => v.SofaType)
                     .Include(v => v.Photos)
-                    .FirstOrDefault(v => v.Id == selectedItem.IdVariant);
+                    .FirstOrDefault(v => v.Id == selectedItem.VariantId);
 
                 if (selectedVariant != null)
                 {
@@ -461,7 +447,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         var selectedItem = (sender as Button).DataContext as ProductViewUser;
         if (selectedItem != null)
         {
-            CartService.Instance.UpdateQuantity(selectedItem.IdVariant, CartService.Instance.GetItemQuantity(selectedItem.IdVariant) + 1);
+            CartService.Instance.UpdateQuantity(selectedItem.VariantId, CartService.Instance.GetItemQuantity(selectedItem.VariantId) + 1);
             CartCount.Text = CartService.Instance.ItemsCount.ToString();
             ApplyFilters();
         }
@@ -472,14 +458,14 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         var selectedItem = (sender as Button).DataContext as ProductViewUser;
         if (selectedItem != null)
         {
-            int newQuantity = CartService.Instance.GetItemQuantity(selectedItem.IdVariant) - 1;
+            int newQuantity = CartService.Instance.GetItemQuantity(selectedItem.VariantId) - 1;
             if (newQuantity <= 0)
             {
-                CartService.Instance.RemoveFromCart(selectedItem.IdVariant);
+                CartService.Instance.RemoveFromCart(selectedItem.VariantId);
             }
             else
             {
-                CartService.Instance.UpdateQuantity(selectedItem.IdVariant, newQuantity);
+                CartService.Instance.UpdateQuantity(selectedItem.VariantId, newQuantity);
             }
             CartCount.Text = CartService.Instance.ItemsCount.ToString();
             ApplyFilters();

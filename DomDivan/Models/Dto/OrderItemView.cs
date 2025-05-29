@@ -3,6 +3,7 @@
 public class OrderItemView
 {
     public string ProductTitle { get; set; }
+    public int VariantId { get; set; }
     public string VariantTitle { get; set; }
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }

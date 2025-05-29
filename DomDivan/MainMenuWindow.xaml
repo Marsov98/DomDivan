@@ -10,36 +10,6 @@
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5"
         ResizeMode="NoResize">
-    
-    <!-- Стиль для кнопок (вынесен в ресурсы) -->
-    <Window.Resources>
-        <Style x:Key="ModernButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <!-- Тёмный цвет -->
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                            CornerRadius="4"
-                            Padding="10,5">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                    <!-- Эффект при наведении -->
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
@@ -120,7 +90,7 @@
                     Height="50"
                     FontSize="16"
                     Click="SuppliesButton_Click"
-                    Style="{StaticResource ModernButtonStyle}"/>
+                    Style="{StaticResource ModernButton}"/>
 
             <Button x:Name="OrdersButton" 
                     Content="Заказы" 
@@ -129,7 +99,7 @@
                     Height="50"
                     FontSize="16"
                     Click="OrdersButton_Click"
-                    Style="{StaticResource ModernButtonStyle}"/>
+                    Style="{StaticResource ModernButton}"/>
 
             <Button x:Name="ProductsButton" 
                     Content="Товары" 
@@ -138,7 +108,7 @@
                     Height="50"
                     FontSize="16"
                     Click="ProductsButton_Click"
-                    Style="{StaticResource ModernButtonStyle}"/>
+                    Style="{StaticResource ModernButton}"/>
         </StackPanel>
     </Grid>
 </Window>

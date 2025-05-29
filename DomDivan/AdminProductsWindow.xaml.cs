@@ -46,6 +46,8 @@ public partial class AdminProductsWindow : Window, INotifyPropertyChanged
             .Include(p => p.Variants)
                 .ThenInclude(v => v.Cloth)
             .Include(p => p.Variants)
+                .ThenInclude(v => v.SofaType)
+            .Include(p => p.Variants)
                 .ThenInclude(v => v.Photos)
             .Select(p => new
             {

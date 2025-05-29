@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DomDivan.Migrations
 {
     /// <inheritdoc />
-    public partial class DB1 : Migration
+    public partial class CDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -78,22 +78,16 @@ namespace DomDivan.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    OrderDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerName = table.Column<string>(type: "TEXT", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    DeliveryAddress = table.Column<string>(type: "TEXT", nullable: false),
-                    Comments = table.Column<string>(type: "TEXT", nullable: true)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,6 +101,21 @@ namespace DomDivan.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SofaTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Suppliers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CompanyName = table.Column<string>(type: "TEXT", nullable: false),
+                    ContactPerson = table.Column<string>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Suppliers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,11 +143,57 @@ namespace DomDivan.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Surname = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Patronymic = table.Column<string>(type: "TEXT", nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    Login = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false),
+                    RoleId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Supplies",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SupplierId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SupplyDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Supplies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Supplies_Suppliers_SupplierId",
+                        column: x => x.SupplierId,
+                        principalTable: "Suppliers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Armchairs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
                     FillerId = table.Column<int>(type: "INTEGER", nullable: false),
                     HasLinenDrawer = table.Column<bool>(type: "INTEGER", nullable: false),
                     HasArmrests = table.Column<bool>(type: "INTEGER", nullable: false)
@@ -153,8 +208,8 @@ namespace DomDivan.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Armchairs_Products_Id",
-                        column: x => x.Id,
+                        name: "FK_Armchairs_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -166,14 +221,15 @@ namespace DomDivan.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
                     SleepingDimensions = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Beds", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Beds_Products_Id",
-                        column: x => x.Id,
+                        name: "FK_Beds_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -185,6 +241,7 @@ namespace DomDivan.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    ProductId = table.Column<int>(type: "INTEGER", nullable: false),
                     SleepingDimensions = table.Column<string>(type: "TEXT", nullable: false),
                     FillerId = table.Column<int>(type: "INTEGER", nullable: false),
                     FoldingMechanismId = table.Column<int>(type: "INTEGER", nullable: false),
@@ -207,8 +264,8 @@ namespace DomDivan.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Sofas_Products_Id",
-                        column: x => x.Id,
+                        name: "FK_Sofas_Products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -256,31 +313,29 @@ namespace DomDivan.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItems",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
-                    VariantId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    UnitPrice = table.Column<int>(type: "INTEGER", nullable: false)
+                    OrderDate = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
+                    DeliveryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<string>(type: "TEXT", nullable: false),
+                    CustomerName = table.Column<string>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    DeliveryAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    Comments = table.Column<string>(type: "TEXT", nullable: true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItems_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_Orders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderItems_Variants_VariantId",
-                        column: x => x.VariantId,
-                        principalTable: "Variants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -304,10 +359,76 @@ namespace DomDivan.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductsInSupply",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SupplyId = table.Column<int>(type: "INTEGER", nullable: false),
+                    VariantId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductsInSupply", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductsInSupply_Supplies_SupplyId",
+                        column: x => x.SupplyId,
+                        principalTable: "Supplies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductsInSupply_Variants_VariantId",
+                        column: x => x.VariantId,
+                        principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    VariantId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Variants_VariantId",
+                        column: x => x.VariantId,
+                        principalTable: "Variants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Armchairs_FillerId",
                 table: "Armchairs",
                 column: "FillerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Armchairs_ProductId",
+                table: "Armchairs",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Beds_ProductId",
+                table: "Beds",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
@@ -330,6 +451,11 @@ namespace DomDivan.Migrations
                 column: "Status");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Photos_VariantId",
                 table: "Photos",
                 column: "VariantId");
@@ -340,6 +466,16 @@ namespace DomDivan.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductsInSupply_SupplyId",
+                table: "ProductsInSupply",
+                column: "SupplyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductsInSupply_VariantId",
+                table: "ProductsInSupply",
+                column: "VariantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Sofas_FillerId",
                 table: "Sofas",
                 column: "FillerId");
@@ -348,6 +484,21 @@ namespace DomDivan.Migrations
                 name: "IX_Sofas_FoldingMechanismId",
                 table: "Sofas",
                 column: "FoldingMechanismId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sofas_ProductId",
+                table: "Sofas",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Supplies_SupplierId",
+                table: "Supplies",
+                column: "SupplierId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoleId",
+                table: "Users",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Variants_ClothId",
@@ -386,10 +537,16 @@ namespace DomDivan.Migrations
                 name: "Photos");
 
             migrationBuilder.DropTable(
+                name: "ProductsInSupply");
+
+            migrationBuilder.DropTable(
                 name: "Sofas");
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Supplies");
 
             migrationBuilder.DropTable(
                 name: "Variants");
@@ -399,6 +556,12 @@ namespace DomDivan.Migrations
 
             migrationBuilder.DropTable(
                 name: "FoldingMechanisms");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Suppliers");
 
             migrationBuilder.DropTable(
                 name: "Cloths");
@@ -411,6 +574,9 @@ namespace DomDivan.Migrations
 
             migrationBuilder.DropTable(
                 name: "SofaTypes");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Categories");

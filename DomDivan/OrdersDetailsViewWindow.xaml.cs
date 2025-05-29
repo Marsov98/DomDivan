@@ -30,8 +30,20 @@ public partial class OrdersDetailsViewWindow : Window
             {
                 order.Status = _order.Status;
                 order.DeliveryDate = _order.DeliveryDate;
+                order.Comments = _order.Comments;
 
-                //_context.Orders.Update(order);
+                _context.Orders.Update(order);
+
+                //Возврат товара
+                if(order.Status == "Отменен")
+                {
+                    foreach (var item in _order.Items)
+                    {
+                        var orderItem = _context.Variants.FirstOrDefault(v => v.Id == item.VariantId);
+                        orderItem.StockQuantity += item.Quantity;
+                        _context.Variants.Update(orderItem);
+                    }
+                }
                 _context.SaveChanges();
                 MessageBox.Show("Изменения сохранены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }

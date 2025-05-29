@@ -1,6 +1,8 @@
-﻿using DomDivan.Models;
+﻿using DocumentFormat.OpenXml.InkML;
+using DomDivan.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +19,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     private bool _isInCart;
     private bool _isVariantNotFound;
     private bool _outOfStock;
+    private bool _isMaxQuantity;
     private Models.ColorVariant _selectedColor;
     private Cloth _selectedCloth;
     private SofaType? _selectedSofaType;
@@ -73,6 +76,16 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         }
     }
 
+    public bool IsMaxQuantity
+    {
+        get => _isMaxQuantity;
+        set
+        {
+            _isMaxQuantity = value;
+            OnPropertyChanged();
+        }
+    }
+
     public Models.ColorVariant SelectedColor
     {
         get => _selectedColor;
@@ -121,36 +134,21 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     public Bed BedInfo { get; private set; }
     public Armchair ArmchairInfo { get; private set; }
 
-    public ProductViewWindow(Product product, int IdVariant)
+
+    public string imageDirPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Image"));
+
+    public ProductViewWindow(int ProductId, int VariantId)
     {
         InitializeComponent();
         DataContext = this;
 
-        LoadProductData(product, IdVariant);
+        LoadProductData(ProductId, VariantId);
     }
 
-    private void LoadProductData(Product product, int IdVariant)
+    private void LoadProductData(int ProductId, int VariantId)
     {
         using (var db = new DomDivanContext())
         {
-            switch (product.Category.Name)
-            {
-                case "Диван":
-                    SofaInfo = db.Sofas
-                        .Include(s => s.Filler)
-                        .Include(s => s.FoldingMechanism)
-                        .FirstOrDefault(s => s.ProductId == product.Id);
-                    break;
-                case "Кровать":
-                    BedInfo = db.Beds.FirstOrDefault(b => b.ProductId == product.Id);
-                    break;
-                case "Кресло":
-                    ArmchairInfo = db.Armchairs
-                        .Include(a => a.Filler)
-                        .FirstOrDefault(a => a.ProductId == product.Id);
-                    break;
-            }
-
             // Загружаем все связанные данные
             Product = db.Products
                 .Include(p => p.Variants)
@@ -162,16 +160,42 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
                 .Include(p => p.Variants)
                     .ThenInclude(v => v.SofaType)
                 .Include(p => p.Category)
-                .FirstOrDefault(p => p.Id == product.Id);
+                .FirstOrDefault(p => p.Id == ProductId);
 
-            CurrentVariant = Product.Variants.FirstOrDefault(v => v.Id == IdVariant);
+            foreach (var variant in Product.Variants)
+            {
+                foreach (var photo in variant.Photos)
+                {
+                    photo.PhotoPath = $"{imageDirPath}\\{photo.PhotoName}";
+                }
+            }
+
+            switch (Product.Category.Name)
+            {
+                case "Диван":
+                    SofaInfo = db.Sofas
+                        .Include(s => s.Filler)
+                        .Include(s => s.FoldingMechanism)
+                        .FirstOrDefault(s => s.ProductId == ProductId);
+                    break;
+                case "Кровать":
+                    BedInfo = db.Beds.FirstOrDefault(b => b.ProductId == ProductId);
+                    break;
+                case "Кресло":
+                    ArmchairInfo = db.Armchairs
+                        .Include(a => a.Filler)
+                        .FirstOrDefault(a => a.ProductId == ProductId);
+                    break;
+            }
+
+            CurrentVariant = Product.Variants.FirstOrDefault(v => v.Id == VariantId);
             UpdateCartStatus();
             InitializeVariants();
 
             // Загружаем первое изображение
             if (CurrentVariant?.Photos?.Any() == true)
             {
-                LoadImage(CurrentVariant.Photos.First().PhotoName);
+                LoadImage(CurrentVariant.Photos.First().PhotoPath);
                 _currentPhotoIndex = 0;
             }
         }
@@ -253,7 +277,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     {
         if (sender is Border border && border.DataContext is PhotoProduct photo)
         {
-            LoadImage(photo.PhotoName);
+            LoadImage(photo.PhotoPath);
             _currentPhotoIndex = CurrentVariant.Photos.IndexOf(photo);
         }
     }
@@ -299,7 +323,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         // Загружаем первое изображение новой вариации
         if (CurrentVariant.Photos.Any())
         {
-            LoadImage(CurrentVariant.Photos.First().PhotoName);
+            LoadImage(CurrentVariant.Photos.First().PhotoPath);
             _currentPhotoIndex = 0;
         }
     }
@@ -312,7 +336,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         if (_currentPhotoIndex < 0)
             _currentPhotoIndex = CurrentVariant.Photos.Count - 1;
 
-        LoadImage(CurrentVariant.Photos[_currentPhotoIndex].PhotoName);
+        LoadImage(CurrentVariant.Photos[_currentPhotoIndex].PhotoPath);
     }
 
     private void NextPhotoButton_Click(object sender, RoutedEventArgs e)
@@ -323,7 +347,7 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
         if (_currentPhotoIndex >= CurrentVariant.Photos.Count)
             _currentPhotoIndex = 0;
 
-        LoadImage(CurrentVariant.Photos[_currentPhotoIndex].PhotoName);
+        LoadImage(CurrentVariant.Photos[_currentPhotoIndex].PhotoPath);
     }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -378,7 +402,8 @@ public partial class ProductViewWindow : Window, INotifyPropertyChanged
     {
         IsInCart = CurrentVariant != null && CartService.Instance.IsInCart(CurrentVariant.Id);
         CartQuantity = CartService.Instance.GetItemQuantity(CurrentVariant?.Id ?? 0);
-        OutOfStock = CurrentVariant.StockQuantity == 0;
+        OutOfStock = CurrentVariant != null && CurrentVariant.StockQuantity == 0;
+        IsMaxQuantity = CurrentVariant != null && CartService.Instance.IsMaxQuantity(CurrentVariant.Id, CurrentVariant.StockQuantity);
         OnPropertyChanged(nameof(CartQuantity));
     }
 

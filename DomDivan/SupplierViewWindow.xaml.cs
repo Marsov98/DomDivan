@@ -38,10 +38,7 @@ public partial class SupplierViewWindow : Window
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        var editWindow = new EditSupplierWindow
-        {
-            Title = "Добавление поставщика"
-        };
+        var editWindow = new EditSupplierWindow();
 
         if (editWindow.ShowDialog() == true)
         {
@@ -53,9 +50,6 @@ public partial class SupplierViewWindow : Window
                     ContactPerson = editWindow.ContactPersonTextBox.Text,
                     PhoneNumber = editWindow.PhoneNumberTextBox.Text
                 };
-
-                _context.Suppliers.Add(newSupplier);
-                _context.SaveChanges();
 
                 LoadSuppliers();
                 SuppliersListBox.SelectedItem = newSupplier;

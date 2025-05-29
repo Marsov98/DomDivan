@@ -10,83 +10,6 @@
         Height="800" Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5">
-
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-
-        <!-- Стиль для кнопок -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10 5"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для опасных кнопок (удаление) -->
-        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
-            <Setter Property="Background" Value="#FF5252"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF3333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Стиль для GroupBox -->
-        <Style TargetType="GroupBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10"/>
-            <Setter Property="Margin" Value="0 0 0 10"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
-
-        <!-- Стиль для текстовых полей -->
-        <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="0,0,0,5"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-
-        <!-- Стиль для ComboBox -->
-        <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="0,0,0,5"/>
-            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-
-        <!-- Стиль для Label -->
-        <Style TargetType="Label">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="0,0,5,0"/>
-        </Style>
-    </Window.Resources>
-
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
@@ -229,26 +152,26 @@
 
                                     <!-- Строка 1: Тип дивана -->
                                     <Label Grid.Row="1" Grid.Column="0" Content="Тип дивана:" 
-                                           Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}"
+                                           Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}}"
                                            VerticalAlignment="Center"/>
                                     <ComboBox Grid.Row="1" Grid.Column="1" 
                                               ItemsSource="{Binding DataContext.SofaTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                                               DisplayMemberPath="Name"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding SofaTypeId}"
-                                              Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Visibility="{Binding DataContext.IsSofaCategory, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"/>
 
                                     <!-- Строка 2: Последняя цена закупки и количество -->
                                     <Label Grid.Row="2" Grid.Column="0" Content="Количество на складе:" VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsEditMode,
                                                         RelativeSource={RelativeSource AncestorType=Window},
-                                                        Converter={StaticResource BoolToVisibility}}"/>
+                                                        Converter={StaticResource BoolToVisibilityConverter}}"/>
                                     <Label Grid.Row="2" Grid.Column="1" 
                                            Content="{Binding StockQuantity, StringFormat='{}{0} шт.'}"
                                            VerticalAlignment="Center"
                                            Visibility="{Binding DataContext.IsEditMode,
                                                         RelativeSource={RelativeSource AncestorType=Window},
-                                                        Converter={StaticResource BoolToVisibility}}"/>
+                                                        Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                                     <Label Grid.Row="2" Grid.Column="2" Content="Последняя цена закупки:" 
                                            VerticalAlignment="Center"
@@ -313,7 +236,7 @@
                     Style="{StaticResource DangerButton}"
                     Click="DeleteProduct_Click"
                     Margin="0,0,10,0"
-                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibility}}"/>
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <Button Content="Добавить вариацию" 
                     Style="{StaticResource ModernButton}"
                     Click="AddVariant_Click" 

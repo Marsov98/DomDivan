@@ -64,11 +64,13 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
                     DeliveryDate = o.DeliveryDate,
                     CreateDate = o.OrderDate,
                     Status = o.Status,
+                    Comments = o.Comments,
                     TotalPrice = o.Items.Sum(oi => oi.UnitPrice * oi.Quantity),
                     ItemsCount = o.Items.Sum(oi => oi.Quantity),
                     Items = o.Items.Select(oi => new OrderItemView
                     {
                         ProductTitle = $"{oi.Variant.Product.Category.Name} \"{oi.Variant.Product.Name}\"",
+                        VariantId = oi.VariantId,
                         VariantTitle = oi.Variant.SofaType == null ?
                                         $"{oi.Variant.Color.Name} {oi.Variant.Cloth.Name}" :
                                         $"{oi.Variant.Color.Name}, {oi.Variant.Cloth.Name}, {oi.Variant.SofaType.Name}",
@@ -180,11 +182,13 @@ public partial class OrdersViewWindow : Window, INotifyPropertyChanged
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {
-
+        new MainMenuWindow().Show();
+        this.Close();
     }
 
     private void ExitButton_Click(object sender, RoutedEventArgs e)
     {
-
+        new LoginWindow().Show();
+        this.Close();
     }
 }

@@ -45,6 +45,11 @@ public class CartService : INotifyPropertyChanged
         return _cartItems.Any(item => item.Variant.Id == variantId);
     }
 
+    public bool IsMaxQuantity(int variantId, int MaxQuantity)
+    {
+        return MaxQuantity == GetItemQuantity(variantId);
+    }
+
     public int GetItemQuantity(int variantId)
     {
         return _cartItems.FirstOrDefault(item => item.Variant.Id == variantId)?.Quantity ?? 0;

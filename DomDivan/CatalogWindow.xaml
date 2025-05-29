@@ -13,59 +13,6 @@
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5"
         SizeChanged="Window_SizeChanged">
-
-    <Window.Resources>
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        <local:DiscountToStrikethroughConverter x:Key="DiscountToStrikethroughConverter"/>
-        <local:DiscountToGrayTextConverter x:Key="DiscountToGrayTextConverter"/>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <local:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
-
-        <!-- Стиль для кнопок -->
-        <Style x:Key="ModernButton" TargetType="Button">
-            <Setter Property="Background" Value="#FF1A1A1A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="20,12"/>
-            <Setter Property="MinHeight" Value="40"/>
-            <Setter Property="MinWidth" Value="100"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF333333"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style TargetType="ListBoxItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBoxItem">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Margin="{TemplateBinding Padding}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
@@ -408,6 +355,7 @@
                                         <TextBlock Grid.Row="2"
                                                    Text="{Binding Description}"
                                                    HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
                                                    TextWrapping="Wrap"
                                                    Margin="0,5"/>
 
@@ -454,7 +402,8 @@
                                                         Style="{StaticResource ModernButton}"
                                                         Width="30"
                                                         Click="IncreaseQuantity_Click"
-                                                        Tag="{Binding Id}"/>
+                                                        Tag="{Binding Id}"
+                                                        Visibility="{Binding IsMaxQuantity, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Grid>
