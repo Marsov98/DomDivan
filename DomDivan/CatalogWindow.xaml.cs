@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -76,6 +74,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
     public ObservableCollection<FilterItem> Cloths { get; } = new();
     public ObservableCollection<FilterItem> Fillings { get; } = new();
     public ObservableCollection<FilterItem> Mechanisms { get; } = new();
+    public ObservableCollection<FilterItem> SofaTypes { get; } = new();
 
     // Цена
     private int _minPrice;
@@ -114,6 +113,7 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
         set { _columnCount = value; OnPropertyChanged(); }
     }
 
+    // Директория папки фотографий
     public string imageDirPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Image"));
 
     #endregion
@@ -255,6 +255,19 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
             item.SelectionChanged += OnFilterSelectionChanged;
             Mechanisms.Add(item);
         }
+
+        // Загрузка типо диванов
+        SofaTypes.Clear();
+        var sofaTypes = await context.SofaTypes
+            .AsNoTracking()
+            .Select(m => m.Name)
+            .ToListAsync();
+        foreach (var sofaType in sofaTypes)
+        {
+            var item = new FilterItem(sofaType);
+            item.SelectionChanged += OnFilterSelectionChanged;
+            SofaTypes.Add(item);
+        }
     }
 
     private void InitializePriceRange()
@@ -341,6 +354,15 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
                     .ToList();
             }
 
+            // Фильтрация по типу
+            if (SofaTypes.Any(m => m.IsSelected) && SofaTypesExpander.Visibility == Visibility.Visible)
+            {
+                var selectedSofaTypes = new HashSet<string>(SofaTypes.Where(m => m.IsSelected).Select(m => m.Name));
+                filtered = filtered.Where(p => !string.IsNullOrEmpty(p.SofaType) &&
+                                             selectedSofaTypes.Contains(p.SofaType))
+                    .ToList();
+            }
+
             // Сортировка
             var sorted = SelectedSortOption?.SortDirection switch
             {
@@ -377,6 +399,10 @@ public partial class CatalogWindow : Window, INotifyPropertyChanged
             : Visibility.Visible;
 
         MechanismExpander.Visibility = (FilterBed || FilterArmchair)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
+        SofaTypesExpander.Visibility = (FilterBed || FilterArmchair)
             ? Visibility.Collapsed
             : Visibility.Visible;
     }

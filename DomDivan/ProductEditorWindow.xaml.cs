@@ -198,7 +198,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     private void AddTextField(string label, string value, string bindingPath)
     {
         var grid = new Grid();
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(160) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         var lbl = new Label
@@ -213,6 +213,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
         {
             Text = value,
             Tag = bindingPath,
+            Width = 100,
             VerticalAlignment = VerticalAlignment.Center
         };
         textBox.TextChanged += CategoryField_TextChanged;
@@ -229,7 +230,7 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
     private void AddComboBoxField(string label, IEnumerable<object> items, int selectedId, string bindingPath)
     {
         var stackPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 5, 0, 5) };
-        stackPanel.Children.Add(new Label { Content = label, Width = 160, VerticalAlignment = VerticalAlignment.Center });
+        stackPanel.Children.Add(new Label { Content = label, Width = 200, VerticalAlignment = VerticalAlignment.Center });
 
         var comboBox = new ComboBox
         {
@@ -557,15 +558,36 @@ public partial class ProductEditorWindow : Window, INotifyPropertyChanged
                         File.Delete($"{imageDirPath}\\{photoToRemove.PhotoName}");
                     }
 
+                    int number = 1;
                     foreach (var photo in variant.Photos)
                     {
                         photo.VariantId = variant.Id;  // Привязываем к вариации
 
                         if (photo.Id == 0)
                         {
-                            // Новая фотография
+                            string newFileName;
+                            string newFilePath;
+
+                            // Находим уникальное имя файла
+                            do
+                            {
+                                newFileName = $"{CurrentProduct.Category.Name}_{CurrentProduct.Name}_{number}.png";
+                                newFilePath = Path.Combine(imageDirPath, newFileName);
+                                number++;
+                            }
+                            while (File.Exists(newFilePath));
+
+                            // Возвращаем последний валидный номер
+                            number--;
+                            newFileName = $"{CurrentProduct.Category.Name}_{CurrentProduct.Name}_{number}.png";
+                            newFilePath = Path.Combine(imageDirPath, newFileName);
+
+                            // Обновляем данные фото
+                            photo.PhotoName = newFileName;
                             _context.Photos.Add(photo);
-                            File.Copy(photo.PhotoPath, $"{imageDirPath}/{photo.PhotoName}", true);
+
+                            // Копируем файл
+                            File.Copy(photo.PhotoPath, newFilePath, true);
                         }
                         else
                         {

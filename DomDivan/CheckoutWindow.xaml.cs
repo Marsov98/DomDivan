@@ -10,7 +10,9 @@ namespace DomDivan;
 
 public partial class CheckoutWindow : Window, INotifyPropertyChanged
 {
+    protected readonly DomDivanContext context;
     private Order _currentOrder;
+    private ObservableCollection<SellerView> _sellers;
     public Order CurrentOrder
     {
         get => _currentOrder;
@@ -22,12 +24,23 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<SellerView> Sellers
+    {
+        get => _sellers;
+        set
+        {
+            _sellers = value;
+            OnPropertyChanged(nameof(Sellers));
+        }
+    }
+
     public bool IsOrderValid { get; private set; }
 
     public int TotalQuantity => CurrentOrder.Items.Sum(x => x.Quantity);
 
     public CheckoutWindow()
     {
+        context = new DomDivanContext();
         InitializeComponent();
         InitializeOrder();
         DataContext = this;
@@ -35,6 +48,15 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
 
     private void InitializeOrder()
     {
+        Sellers = new ObservableCollection<SellerView>(
+                   context.Users
+                          .Select(u => new SellerView
+                          {
+                              UserId = u.Id,
+                              FullName = $"{u.Surname} {u.Name} {u.Patronymic}"
+                          })
+                          .ToList());
+
         CurrentOrder = new Order
         {
             DeliveryDate = DateTime.Now.AddDays(3),
@@ -62,13 +84,19 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
         ValidateOrder();
     }
 
+    private void Validate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ValidateOrder();
+    }
+
     private void ValidateOrder()
     {
         IsOrderValid = !string.IsNullOrWhiteSpace(CurrentOrder.CustomerName) &&
                       !string.IsNullOrWhiteSpace(CurrentOrder.PhoneNumber) &&
                       !string.IsNullOrWhiteSpace(CurrentOrder.DeliveryAddress) &&
                       CurrentOrder.DeliveryDate >= DateTime.Now.Date &&
-                      CurrentOrder.Items.Any();
+                      CurrentOrder.Items.Any() &&
+                      CurrentOrder.UserId > 0;
 
         OnPropertyChanged(nameof(IsOrderValid));
     }
@@ -84,24 +112,22 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
 
         try
         {
-            foreach(var item in CurrentOrder.Items)
+            foreach (var item in CurrentOrder.Items)
             {
                 item.Id = 0;
                 item.Variant = null;
             }
-            using(var context = new DomDivanContext())
+
+            context.Orders.Add(CurrentOrder);
+
+            foreach (var item in CurrentOrder.Items)
             {
-                context.Orders.Add(CurrentOrder);
-
-                foreach (var item in CurrentOrder.Items)
-                {
-                    var currentItem = context.Variants.FirstOrDefault(v => v.Id == item.VariantId);
-                    currentItem.StockQuantity -= item.Quantity;
-                    context.Variants.Update(currentItem);
-                }
-
-                context.SaveChanges();
+                var currentItem = context.Variants.FirstOrDefault(v => v.Id == item.VariantId);
+                currentItem.StockQuantity -= item.Quantity;
+                context.Variants.Update(currentItem);
             }
+
+            context.SaveChanges();
 
             MessageBox.Show($"Заказ №{CurrentOrder.Id} успешно оформлен!\n\n" +
                           $"Клиент: {CurrentOrder.CustomerName}\n" +
@@ -131,15 +157,13 @@ public partial class CheckoutWindow : Window, INotifyPropertyChanged
                 });
             }
 
-            GenerateWord.GenerateWordReceipt(CartItems, CurrentOrder);
+            GenerateWord.GenerateWordReceipt(CartItems, CurrentOrder, Sellers.FirstOrDefault(s => CurrentOrder.UserId == s.UserId).FullName);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при оформлении заказа: {ex.Message}", 
+            MessageBox.Show($"Ошибка при оформлении заказа: {ex.Message}",
                             "Ошибка оформления", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-
-
 
         CartService.Instance.ClearCart();
         new CatalogWindow().Show();

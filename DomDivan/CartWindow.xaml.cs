@@ -1,6 +1,7 @@
 ﻿using DomDivan.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,6 +14,7 @@ public partial class CartWindow : Window, INotifyPropertyChanged
     public decimal TotalPrice { get; set; }
     public decimal TotalDiscountPrice {  get; set; }
     public bool HasEqual { get; set; }
+    public string imageDirPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Image"));
 
     public CartWindow()
     {
@@ -32,8 +34,7 @@ public partial class CartWindow : Window, INotifyPropertyChanged
             {
                 VariantId = cartItem.Variant.Id,
                 Title = $"{cartItem.Variant.Product.Category.Name} \"{cartItem.Variant.Product.Name}\"",
-                PrimaryPhoto = cartItem.Variant.Photos.FirstOrDefault(p => p.IsPrimary)?.PhotoName
-                            ?? cartItem.Variant.Photos.FirstOrDefault()?.PhotoName,
+                PrimaryPhoto = imageDirPath + '\\' + cartItem.Variant.Photos.FirstOrDefault(p => p.IsPrimary).PhotoName,
                 Color = cartItem.Variant.Color.Name,
                 Cloth = cartItem.Variant.Cloth.Name,
                 SofaType = cartItem.Variant.SofaType?.Name,

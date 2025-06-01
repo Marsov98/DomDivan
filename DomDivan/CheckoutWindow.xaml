@@ -5,8 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Оформление заказа"
-        WindowState="Maximized"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="#FFF5F5F5">
     <Grid>
@@ -75,6 +73,17 @@
                         <DatePicker SelectedDate="{Binding CurrentOrder.DeliveryDate, UpdateSourceTrigger=PropertyChanged}" 
                                     SelectedDateChanged="Validate_SelectedDateChanged"
                                     Margin="0,0,0,10"/>
+
+                        <Label Content="Продавец:" FontSize="14"/>
+                        <ComboBox x:Name="SellerComboBox" 
+                                  ItemsSource="{Binding Sellers}"
+                                  DisplayMemberPath="FullName"
+                                  SelectedValuePath="UserId"
+                                  SelectedValue="{Binding CurrentOrder.UserId}"
+                                  Margin="0,0,0,10"
+                                  FontSize="14"
+                                  SelectionChanged="Validate_SelectionChanged"/>
+
 
                         <Label Content="Комментарий (необязательно):" FontSize="14"/>
                         <TextBox Text="{Binding CurrentOrder.Comments}" 

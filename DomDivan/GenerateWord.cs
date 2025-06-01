@@ -9,7 +9,7 @@ namespace DomDivan;
 
 public class GenerateWord
 {
-    public static void GenerateWordReceipt(ObservableCollection<CartView> orderItems, Order order)
+    public static void GenerateWordReceipt(ObservableCollection<CartView> orderItems, Order order, string SellerName)
     {
         string filePath = $"C:\\Users\\gghgg\\Desktop\\vs studio\\Диплом\\Заказ_{order.Id}.docx";
 
@@ -95,7 +95,7 @@ public class GenerateWord
             body.AppendChild(CreateParagraphWithProperties($"Номер телефона покупателя: {order.PhoneNumber}", false, 14));
             body.AppendChild(CreateParagraphWithProperties($"Адрес доставки: {order.DeliveryAddress}", false, 14));
             body.AppendChild(CreateParagraphWithProperties($"Дата доставки: {order.DeliveryDate.ToString("dd.MM.yyyy")}г.", false, 14));
-            body.AppendChild(CreateParagraphWithProperties($"Продавец ___________________", false, 14));
+            body.AppendChild(CreateParagraphWithProperties($"Продавец: {SellerName} ________________", false, 14));
 
             doc.Save();
 
